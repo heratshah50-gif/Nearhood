@@ -1,0 +1,346 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  X,
+  Phone,
+  ArrowRight,
+  CheckCircle2,
+  Shield,
+  Loader2,
+  RefreshCw,
+} from "lucide-react";
+import OTPInput from "./OTPInput";
+
+interface LoginModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess?: (isAdmin: boolean) => void;
+}
+
+type Step = "phone" | "otp" | "success";
+
+export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalProps) {
+  const [step, setStep] = useState<Step>("phone");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [resendTimer, setResendTimer] = useState(30);
+  const [canResend, setCanResend] = useState(false);
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setTimeout(() => {
+        setStep("phone");
+        setPhoneNumber("");
+        setIsLoading(false);
+        setResendTimer(30);
+        setCanResend(false);
+      }, 300);
+    }
+  }, [isOpen]);
+
+  // Resend timer countdown
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (step === "otp" && resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => {
+          if (prev <= 1) {
+            setCanResend(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [step, resendTimer]);
+
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (phoneNumber.length !== 10) return;
+
+    setIsLoading(true);
+    // Simulate API call
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setIsLoading(false);
+    setStep("otp");
+  };
+
+  const handleOTPComplete = async (otp: string) => {
+    console.log("OTP entered:", otp);
+    setIsLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setIsLoading(false);
+    // Admin login: phone 9999999999 → set session and redirect to /admin
+    if (phoneNumber === "9999999999") {
+      if (typeof window !== "undefined") window.sessionStorage.setItem("nearhood_admin", "1");
+      onSuccess?.(true);
+      onClose();
+      return;
+    }
+    // Vendor login: phone 8888888888 → set session and redirect to /vendor
+    if (phoneNumber === "8888888888") {
+      if (typeof window !== "undefined") window.sessionStorage.setItem("nearhood_vendor", "1");
+      onSuccess?.(true);
+      onClose();
+      return;
+    }
+    setStep("success");
+    setTimeout(() => onClose(), 2000);
+  };
+
+  const handleResendOTP = async () => {
+    if (!canResend) return;
+    
+    setIsLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsLoading(false);
+    setResendTimer(30);
+    setCanResend(false);
+  };
+
+  const formatPhoneDisplay = (phone: string) => {
+    if (phone.length <= 5) return phone;
+    return `${phone.slice(0, 5)} ${phone.slice(5)}`;
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            onClick={onClose}
+          />
+
+          {/* Modal */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ duration: 0.2 }}
+            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-50 p-4"
+          >
+            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+              {/* Header */}
+              <div className="relative px-6 pt-6 pb-4 bg-gradient-to-r from-primary-500 to-primary-600">
+                <button
+                  onClick={onClose}
+                  className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+                
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                    {step === "success" ? (
+                      <CheckCircle2 className="w-6 h-6 text-white" />
+                    ) : (
+                      <Phone className="w-5 h-5 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <h2
+                      className="text-xl font-bold text-white"
+                      style={{ fontFamily: "var(--font-display)" }}
+                    >
+                      {step === "phone" && "Login / Sign Up"}
+                      {step === "otp" && "Verify OTP"}
+                      {step === "success" && "Welcome!"}
+                    </h2>
+                  </div>
+                </div>
+                <p className="text-primary-100 text-sm">
+                  {step === "phone" && "Enter your phone number to continue"}
+                  {step === "otp" && `OTP sent to +91 ${formatPhoneDisplay(phoneNumber)}`}
+                  {step === "success" && "You have successfully logged in"}
+                </p>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                <AnimatePresence mode="wait">
+                  {/* Phone Input Step */}
+                  {step === "phone" && (
+                    <motion.form
+                      key="phone"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.2 }}
+                      onSubmit={handlePhoneSubmit}
+                    >
+                      <div className="mb-6">
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Phone Number
+                        </label>
+                        <div className="flex">
+                          <div className="flex items-center px-4 bg-neutral-100 border-2 border-r-0 border-neutral-200 rounded-l-xl">
+                            <span className="text-neutral-600 font-medium">+91</span>
+                          </div>
+                          <input
+                            type="tel"
+                            inputMode="numeric"
+                            maxLength={10}
+                            value={phoneNumber}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/[^0-9]/g, "");
+                              setPhoneNumber(value);
+                            }}
+                            placeholder="Enter 10 digit number"
+                            className="flex-1 px-4 py-4 border-2 border-neutral-200 rounded-r-xl focus:border-primary-400 focus:ring-4 focus:ring-primary-100 outline-none text-lg tracking-wider"
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={phoneNumber.length !== 10 || isLoading}
+                        className={`w-full py-4 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all ${
+                          phoneNumber.length === 10 && !isLoading
+                            ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/25 hover:shadow-xl"
+                            : "bg-neutral-100 text-neutral-400 cursor-not-allowed"
+                        }`}
+                      >
+                        {isLoading ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <>
+                            Get OTP
+                            <ArrowRight className="w-5 h-5" />
+                          </>
+                        )}
+                      </button>
+                    </motion.form>
+                  )}
+
+                  {/* OTP Step */}
+                  {step === "otp" && (
+                    <motion.div
+                      key="otp"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 20 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="mb-6">
+                        <p className="text-sm text-neutral-600 text-center mb-6">
+                          Enter the 6-digit code sent to your phone
+                        </p>
+                        <OTPInput
+                          length={6}
+                          onComplete={handleOTPComplete}
+                          disabled={isLoading}
+                        />
+                      </div>
+
+                      {isLoading && (
+                        <div className="flex items-center justify-center gap-2 mb-4">
+                          <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
+                          <span className="text-sm text-neutral-500">Verifying...</span>
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between text-sm">
+                        <button
+                          onClick={() => setStep("phone")}
+                          className="text-neutral-500 hover:text-neutral-700 transition-colors"
+                        >
+                          Change number
+                        </button>
+                        <button
+                          onClick={handleResendOTP}
+                          disabled={!canResend || isLoading}
+                          className={`flex items-center gap-1 ${
+                            canResend && !isLoading
+                              ? "text-primary-600 hover:text-primary-700"
+                              : "text-neutral-400 cursor-not-allowed"
+                          }`}
+                        >
+                          <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
+                          {canResend ? "Resend OTP" : `Resend in ${resendTimer}s`}
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {/* Success Step */}
+                  {step === "success" && (
+                    <motion.div
+                      key="success"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.3 }}
+                      className="text-center py-8"
+                    >
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                        className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4"
+                      >
+                        <CheckCircle2 className="w-10 h-10 text-green-500" />
+                      </motion.div>
+                      <h3
+                        className="text-xl font-bold text-neutral-800 mb-2"
+                        style={{ fontFamily: "var(--font-display)" }}
+                      >
+                        Login Successful!
+                      </h3>
+                      <p className="text-neutral-500">
+                        Welcome to Nearhood. Start exploring properties!
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Footer */}
+              {step !== "success" && (
+                <div className="px-6 pb-6">
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-primary-50 border border-primary-100">
+                    <Shield className="w-5 h-5 text-primary-600 flex-shrink-0" />
+                    <p className="text-xs text-primary-700">
+                      By continuing, you agree to our{" "}
+                      <a href="#" className="underline font-medium">
+                        Terms of Service
+                      </a>{" "}
+                      and{" "}
+                      <a href="#" className="underline font-medium">
+                        Privacy Policy
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+
