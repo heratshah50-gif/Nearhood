@@ -167,7 +167,7 @@ export default function Hero() {
         <div className="absolute bottom-0 left-0 w-[200px] h-[200px] md:w-[400px] md:h-[400px] bg-primary-50 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
       </div>
 
-      <div className="container-custom relative z-10 pt-6 pb-8 md:pt-8 md:pb-12 lg:pt-12 lg:pb-16 overflow-x-hidden">
+      <div className="container-custom relative z-10 pt-6 pb-4 md:pt-8 md:pb-6 lg:pt-12 lg:pb-8 overflow-x-hidden">
         <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
           {/* Left Content */}
           <div>
@@ -342,7 +342,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-16 lg:mt-20"
+          className="mt-10 lg:mt-12"
         >
           <div className="bg-neutral-50 rounded-2xl lg:rounded-3xl border border-neutral-100 p-6 lg:p-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">

@@ -81,7 +81,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
         }`}
       >
         <div className="container-custom">
-          <nav className={`flex items-center ${hideNavigation ? 'gap-4' : 'justify-between'} py-0.5`}>
+          <nav className="flex items-center justify-between gap-4 py-0.5 flex-nowrap">
             {/* Logo */}
             <Link href="/" className="flex items-center group flex-shrink-0">
               <Image
@@ -96,7 +96,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
 
             {/* Search Bar in Header when hideNavigation is true */}
             {hideNavigation && searchProps && (
-              <div className="flex-1 max-w-5xl mx-auto px-2 sm:px-4">
+              <div className="flex-1 min-w-0 px-2 sm:px-4">
                 <div className="rounded-3xl bg-white shadow-lg shadow-primary-100/70 border border-primary-100/70 px-4 py-3 md:px-6 md:py-4 flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
                   {/* City */}
                   <div className="w-full md:w-[32%]">
@@ -141,13 +141,13 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                     </p>
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400" />
-                      <input
-                        type="text"
-                        placeholder="1BHK / 2BHK / 3BHK, project or location"
-                        value={searchProps.searchQuery}
-                        onChange={(e) => searchProps.onSearchChange(e.target.value)}
-                        className="w-full pl-9 pr-3 py-2.5 rounded-2xl border border-neutral-200 text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
-                      />
+                  <input
+                    type="text"
+                    placeholder="Search by project, location or keyword"
+                    value={searchProps.searchQuery}
+                    onChange={(e) => searchProps.onSearchChange(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 rounded-2xl border border-neutral-200 text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
+                  />
                     </div>
                   </div>
 

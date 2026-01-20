@@ -61,7 +61,7 @@ export default function PropertySearch({ variant = "default" }: PropertySearchPr
   const isCompact = variant === "compact";
 
   return (
-    <section className={isCompact ? "pt-4 pb-4 bg-neutral-50" : "py-6 md:py-8 bg-neutral-50"}>
+    <section className={isCompact ? "pt-4 pb-4 bg-neutral-50" : "pt-4 pb-6 md:pt-5 md:pb-7 bg-neutral-50"}>
       <div className={isCompact ? "container-custom flex justify-center" : "container-custom"}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -115,7 +115,7 @@ export default function PropertySearch({ variant = "default" }: PropertySearchPr
                     aria-hidden
                     onClick={() => setLocationOpen(false)}
                   />
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-neutral-100 py-2 z-50 max-h-64 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-neutral-100 py-1.5 z-50 max-h-48 overflow-y-auto">
                     <button
                       type="button"
                       onClick={() => {
@@ -178,7 +178,7 @@ export default function PropertySearch({ variant = "default" }: PropertySearchPr
                     aria-hidden
                     onClick={() => setPropertyOpen(false)}
                   />
-                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-neutral-100 py-2 z-50 max-h-56 overflow-y-auto">
+                  <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-neutral-100 py-1.5 z-50 max-h-44 overflow-y-auto">
                     {heroPropertyTypes.map((p) => (
                       <button
                         key={p}
@@ -228,9 +228,9 @@ export default function PropertySearch({ variant = "default" }: PropertySearchPr
 
           {/* Advanced filters panel – opens when user clicks Budget & More Filters */}
           {showAdvancedFilters && (
-            <div className="mt-4 border-t border-neutral-200 pt-4">
-              <div className="max-h-[320px] overflow-y-auto pr-1">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="mt-2 border-t border-neutral-200 pt-2">
+              <div className="max-h-[220px] overflow-y-auto pr-1">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                 {/* Locations / Sub-regions */}
                 <div>
                   <h3 className="text-sm font-semibold text-neutral-800 mb-3 flex items-center gap-1.5">

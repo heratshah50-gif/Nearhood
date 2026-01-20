@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import LoginModal from "@/components/auth/LoginModal";
-import PropertySearch from "@/components/sections/PropertySearch";
 import { AHMEDABAD_LOCATIONS } from "@/lib/ahmedabad-locations";
 import { ALL_PROPERTIES, Property, getPropertySlug } from "@/lib/properties-data";
 import {
@@ -216,16 +215,18 @@ export default function PropertiesPage() {
     <div className="min-h-screen bg-white">
       <Header 
         onLoginClick={() => setIsLoginModalOpen(true)} 
-        hideNavigation={false}
+        hideNavigation={true}
+        searchProps={{
+          selectedCity: selectedLocation,
+          onCityChange: setSelectedLocation,
+          searchQuery,
+          onSearchChange: handleSearch,
+          locationOptions: [...AHMEDABAD_LOCATIONS],
+        }}
       />
 
-      {/* Property Search Bar - Compact, centered */}
-      <div className="bg-neutral-50 pt-12 md:pt-16">
-        <PropertySearch variant="compact" />
-      </div>
-
-      {/* Properties Grid/Map - Start below search bar */}
-      <div className="container-custom pt-6 md:pt-8 pb-6 relative">
+      {/* Properties Grid/Map - Start below header with integrated search */}
+      <div className="container-custom pt-20 md:pt-24 lg:pt-28 pb-6 relative">
           {viewMode === "list" ? (
             <div className="flex flex-col lg:flex-row gap-6 items-start">
               {/* Mobile Filter Toggle Button */}
