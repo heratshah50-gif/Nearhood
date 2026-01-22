@@ -562,7 +562,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                                 onClick={() => setIsUserDropdownOpen(false)}
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
                               >
-                                <Compare className="w-4 h-4" />
+                                <GitCompare className="w-4 h-4" />
                                 <span>Compare</span>
                               </Link>
                             </div>
