@@ -138,9 +138,9 @@ export default function Footer({ hideSubscribe = false }: FooterProps) {
                   <Image
                     src="/images/logo.png"
                     alt="Nearhood"
-                    width={160}
-                    height={45}
-                    className="h-20 sm:h-24 md:h-28 w-auto"
+                    width={192}
+                    height={54}
+                    className="h-24 sm:h-28 md:h-32 w-auto"
                   />
                 </Link>
                 

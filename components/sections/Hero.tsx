@@ -223,15 +223,16 @@ export default function Hero() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <motion.a
-                href="#properties"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 transition-all text-lg"
-              >
-                Explore Properties
-                <ArrowRight className="w-5 h-5" />
-              </motion.a>
+              <Link href="/properties">
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 transition-all text-lg cursor-pointer"
+                >
+                  Explore Properties
+                  <ArrowRight className="w-5 h-5" />
+                </motion.div>
+              </Link>
               <motion.a
                 href="#how-it-works"
                 whileHover={{ scale: 1.02 }}

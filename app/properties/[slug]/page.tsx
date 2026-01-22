@@ -87,9 +87,20 @@ export default function PropertyDetailPage({ params }: PropertyDetailPageProps) 
       <Header onLoginClick={() => setIsLoginModalOpen(true)} />
 
       <main className="flex-1">
-        <div className="container-custom pt-14 lg:pt-16 pb-8 md:pb-10">
+        <div className="container-custom pt-24 md:pt-28 lg:pt-32 pb-4 md:pb-6">
+          {/* Return to listings button below header */}
+          <div className="mb-3 md:mb-4">
+            <button
+              onClick={() => router.push("/properties")}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-neutral-200 bg-white text-xs md:text-sm text-neutral-700 hover:bg-neutral-50"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Return to listings
+            </button>
+          </div>
+
           {/* Breadcrumb path under header, just above property card */}
-          <div className="mb-2 md:mb-3 flex items-center justify-between gap-4">
+          <div className="mb-3 md:mb-4 flex items-center justify-between gap-4">
             <nav className="text-xs md:text-sm text-neutral-500">
               <button
                 onClick={() => router.push("/")}
@@ -116,14 +127,6 @@ export default function PropertyDetailPage({ params }: PropertyDetailPageProps) 
                 {property.name}
               </span>
             </nav>
-
-            <button
-              onClick={() => router.push("/properties")}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-neutral-200 bg-white text-xs md:text-sm text-neutral-700 hover:bg-neutral-50"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to listings
-            </button>
           </div>
 
           {/* Hero card */}
@@ -131,7 +134,7 @@ export default function PropertyDetailPage({ params }: PropertyDetailPageProps) 
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="mt-3 md:mt-4 bg-gradient-to-r from-primary-50 to-amber-50 rounded-2xl md:rounded-3xl shadow-lg border border-primary-100 overflow-hidden"
+            className="mt-4 md:mt-6 bg-gradient-to-r from-primary-50 to-amber-50 rounded-2xl md:rounded-3xl shadow-lg border border-primary-100 overflow-hidden"
           >
             <div className="grid grid-cols-1 lg:grid-cols-2">
               {/* Left content */}
@@ -396,15 +399,62 @@ export default function PropertyDetailPage({ params }: PropertyDetailPageProps) 
               })}
             </div>
 
-            {/* Additional details placeholder – kept light to match theme */}
+            {/* Additional details – shown inside the Property Details tab */}
             <div className="space-y-6">
-              <section id="property-details" className="bg-white rounded-xl border border-neutral-200 p-4 md:p-5">
-                <h2 className="text-base md:text-lg font-semibold text-neutral-900 mb-2">
+              <section
+                id="property-details"
+                className="bg-white rounded-xl border border-neutral-200 p-4 md:p-5"
+              >
+                <h2 className="text-base md:text-lg font-semibold text-neutral-900 mb-4">
                   Property Details
                 </h2>
-                <p className="text-sm md:text-base text-neutral-700 leading-relaxed">
-                  Detailed information about the unit types, towers, phase and project status can go here. You can replace this placeholder with real data from your backend.
-                </p>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* About this project */}
+                  <div className="lg:col-span-2">
+                    <div className="bg-white rounded-xl border border-neutral-200 p-4 md:p-5">
+                      <h3 className="text-sm md:text-base font-semibold text-neutral-900 mb-2">
+                        About this project
+                      </h3>
+                      <p className="text-sm md:text-base text-neutral-700 leading-relaxed">
+                        This is a sample description area where you can add more
+                        information about the project, its location advantages,
+                        amenities, and builder background. We have kept the layout
+                        simple and clean so it blends with the existing Nearhood
+                        theme. You can later replace this text with real project
+                        details from your CMS or backend.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Quick facts */}
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-xl border border-neutral-200 p-4 md:p-5">
+                      <h3 className="text-sm font-semibold text-neutral-900 mb-3">
+                        Quick facts
+                      </h3>
+                      <dl className="space-y-2 text-sm text-neutral-700">
+                        <div className="flex justify-between gap-4">
+                          <dt className="text-neutral-500">City</dt>
+                          <dd className="font-medium">{slugCity}</dd>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                          <dt className="text-neutral-500">Location</dt>
+                          <dd className="font-medium">{property.location}</dd>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                          <dt className="text-neutral-500">Configuration</dt>
+                          <dd className="font-medium">
+                            {property.bhkOptions.join(", ")}
+                          </dd>
+                        </div>
+                        <div className="flex justify-between gap-4">
+                          <dt className="text-neutral-500">Super area</dt>
+                          <dd className="font-medium">{property.superArea}</dd>
+                        </div>
+                      </dl>
+                    </div>
+                  </div>
+                </div>
               </section>
 
               <section id="highlights" className="bg-white rounded-xl border border-neutral-200 p-4 md:p-5">
@@ -452,7 +502,10 @@ export default function PropertyDetailPage({ params }: PropertyDetailPageProps) 
                 </p>
               </section>
 
-              <section id="specifications" className="bg-white rounded-xl border border-neutral-200 p-4 md:p-5">
+              <section
+                id="specifications"
+                className="bg-white rounded-xl border border-neutral-200 p-4 md:p-5"
+              >
                 <h2 className="text-base md:text-lg font-semibold text-neutral-900 mb-2">
                   Specifications
                 </h2>
@@ -463,52 +516,6 @@ export default function PropertyDetailPage({ params }: PropertyDetailPageProps) 
             </div>
           </div>
 
-          {/* Existing additional details block retained for now */}
-          <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 space-y-4">
-              <div className="bg-white rounded-xl border border-neutral-200 p-4 md:p-5">
-                <h2 className="text-base md:text-lg font-semibold text-neutral-900 mb-2">
-                  About this project
-                </h2>
-                <p className="text-sm md:text-base text-neutral-700 leading-relaxed">
-                  This is a sample description area where you can add more
-                  information about the project, its location advantages,
-                  amenities, and builder background. We have kept the layout
-                  simple and clean so it blends with the existing Nearhood
-                  theme. You can later replace this text with real project
-                  details from your CMS or backend.
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="bg-white rounded-xl border border-neutral-200 p-4 md:p-5">
-                <h3 className="text-sm font-semibold text-neutral-900 mb-3">
-                  Quick facts
-                </h3>
-                <dl className="space-y-2 text-sm text-neutral-700">
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-neutral-500">City</dt>
-                    <dd className="font-medium">{slugCity}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-neutral-500">Location</dt>
-                    <dd className="font-medium">{property.location}</dd>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-neutral-500">Configuration</dt>
-                    <dd className="font-medium">
-                      {property.bhkOptions.join(", ")}
-                    </dd>
-                  </div>
-                  <div className="flex justify-between gap-4">
-                    <dt className="text-neutral-500">Super area</dt>
-                    <dd className="font-medium">{property.superArea}</dd>
-                  </div>
-                </dl>
-              </div>
-            </div>
-          </div>
         </div>
       </main>
 

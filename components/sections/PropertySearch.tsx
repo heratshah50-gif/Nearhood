@@ -226,6 +226,28 @@ export default function PropertySearch({ variant = "default" }: PropertySearchPr
             </div>
           </div>
 
+          {/* Location Suggestions - hidden when advanced filters are open */}
+          {!showAdvancedFilters && (
+            <div className="mt-4 pt-4 border-t border-neutral-100">
+              <p className="text-xs text-neutral-500 mb-2 font-medium">Popular Locations:</p>
+              <div className="flex flex-wrap gap-2">
+                {["Bopal", "SG Highway", "Bodakdev", "Satellite", "Prahlad Nagar", "Thaltej"].map((loc) => (
+                  <button
+                    key={loc}
+                    type="button"
+                    onClick={() => {
+                      setSelectedLocation(loc);
+                      setLocationOpen(false);
+                    }}
+                    className="px-3 py-1.5 rounded-full bg-primary-50 border border-primary-200 text-primary-700 text-xs md:text-sm font-medium hover:bg-primary-100 hover:border-primary-300 transition-colors"
+                  >
+                    {loc}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Advanced filters panel – opens when user clicks Budget & More Filters */}
           {showAdvancedFilters && (
             <div className="mt-2 border-t border-neutral-200 pt-2">

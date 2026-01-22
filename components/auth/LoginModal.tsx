@@ -75,43 +75,146 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
     if (phoneNumber.length !== 10) return;
 
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    setStep("otp");
+    try {
+      const response = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ phoneNumber }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || "Failed to send OTP. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      // In development, log OTP to console for testing
+      if (data.otp) {
+        console.log(`[DEV] OTP for ${phoneNumber}: ${data.otp}`);
+      }
+
+      setIsLoading(false);
+      setStep("otp");
+      setResendTimer(30);
+      setCanResend(false);
+    } catch (error) {
+      console.error("Error sending OTP:", error);
+      alert("Failed to send OTP. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   const handleOTPComplete = async (otp: string) => {
-    console.log("OTP entered:", otp);
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    // Admin login: phone 9999999999 → set session and redirect to /admin
-    if (phoneNumber === "9999999999") {
-      if (typeof window !== "undefined") window.sessionStorage.setItem("nearhood_admin", "1");
-      onSuccess?.(true);
-      onClose();
-      return;
+    try {
+      const response = await fetch("/api/auth/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ phoneNumber, otp }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || "Invalid OTP. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(false);
+
+      // Set session based on user type
+      if (data.isAdmin) {
+        if (typeof window !== "undefined") {
+          window.sessionStorage.setItem("nearhood_admin", "1");
+          window.sessionStorage.setItem("nearhood_user", JSON.stringify({
+            phoneNumber,
+            name: "Admin User",
+          }));
+          window.dispatchEvent(new Event("userLoggedIn"));
+        }
+        onSuccess?.(true);
+        onClose();
+        return;
+      }
+
+      if (data.isVendor) {
+        if (typeof window !== "undefined") {
+          window.sessionStorage.setItem("nearhood_vendor", "1");
+          window.sessionStorage.setItem("nearhood_user", JSON.stringify({
+            phoneNumber,
+            name: "Vendor User",
+          }));
+          window.dispatchEvent(new Event("userLoggedIn"));
+        }
+        onSuccess?.(true);
+        onClose();
+        return;
+      }
+
+      // Regular user login - store user info
+      if (typeof window !== "undefined") {
+        window.sessionStorage.setItem("nearhood_user", JSON.stringify({
+          phoneNumber,
+          name: `User ${phoneNumber.slice(-4)}`, // Use last 4 digits as name placeholder
+        }));
+      }
+
+      setStep("success");
+      setTimeout(() => {
+        onClose();
+        // Trigger a custom event to notify header of login
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("userLoggedIn"));
+        }
+      }, 2000);
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      alert("Failed to verify OTP. Please try again.");
+      setIsLoading(false);
     }
-    // Vendor login: phone 8888888888 → set session and redirect to /vendor
-    if (phoneNumber === "8888888888") {
-      if (typeof window !== "undefined") window.sessionStorage.setItem("nearhood_vendor", "1");
-      onSuccess?.(true);
-      onClose();
-      return;
-    }
-    setStep("success");
-    setTimeout(() => onClose(), 2000);
   };
 
   const handleResendOTP = async () => {
     if (!canResend) return;
     
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setIsLoading(false);
-    setResendTimer(30);
-    setCanResend(false);
+    try {
+      const response = await fetch("/api/auth/send-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ phoneNumber }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error || "Failed to resend OTP. Please try again.");
+        setIsLoading(false);
+        return;
+      }
+
+      // In development, log OTP to console for testing
+      if (data.otp) {
+        console.log(`[DEV] Resent OTP for ${phoneNumber}: ${data.otp}`);
+      }
+
+      setIsLoading(false);
+      setResendTimer(30);
+      setCanResend(false);
+    } catch (error) {
+      console.error("Error resending OTP:", error);
+      alert("Failed to resend OTP. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   const formatPhoneDisplay = (phone: string) => {
@@ -129,7 +232,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150]"
             onClick={onClose}
           />
 
@@ -139,9 +242,9 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.2 }}
-            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md z-50 p-4"
+            className="fixed inset-0 z-[200] flex items-center justify-center p-4"
           >
-            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
               {/* Header */}
               <div className="relative px-6 pt-6 pb-4 bg-gradient-to-r from-primary-500 to-primary-600">
                 <button

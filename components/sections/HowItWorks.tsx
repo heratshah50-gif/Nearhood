@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
+import Link from "next/link";
 import {
   Search,
   UserPlus,
@@ -212,13 +213,13 @@ export default function HowItWorks() {
                 Join 500+ families who bought smarter
               </p>
             </div>
-            <a
-              href="#properties"
+            <Link
+              href="/properties"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 transition-all whitespace-nowrap"
             >
               Start Your Journey
               <ArrowRight className="w-4 h-4" />
-            </a>
+            </Link>
           </div>
         </motion.div>
 

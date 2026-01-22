@@ -169,24 +169,106 @@ export default function PropertiesPage() {
   const [configurationType, setConfigurationType] = useState("");
   const [budget, setBudget] = useState("");
   const [areaSqft, setAreaSqft] = useState("");
+  const [selectedSubRegions, setSelectedSubRegions] = useState<string[]>([]);
+  const [selectedConfigs, setSelectedConfigs] = useState<string[]>([]);
+  const [budgetMaxCr, setBudgetMaxCr] = useState<number | null>(null);
+  const [propertyType, setPropertyType] = useState("");
   const propertiesGridRef = useRef<HTMLDivElement>(null);
 
-  // Read location from URL on mount
+  // Read all filters from URL on mount
   useEffect(() => {
     const loc = searchParams.get("location");
     if (loc && AHMEDABAD_LOCATIONS.includes(loc as any)) setSelectedLocation(loc);
+    
+    const type = searchParams.get("type");
+    if (type) setPropertyType(type);
+    
+    const areas = searchParams.get("areas");
+    if (areas) {
+      const areaList = areas.split(",").filter(a => AHMEDABAD_LOCATIONS.includes(a as any));
+      setSelectedSubRegions(areaList);
+    }
+    
+    const config = searchParams.get("config");
+    if (config) {
+      setSelectedConfigs(config.split(","));
+    }
+    
+    const budgetParam = searchParams.get("budgetMaxCr");
+    if (budgetParam) {
+      const budgetValue = parseFloat(budgetParam);
+      if (!isNaN(budgetValue)) setBudgetMaxCr(budgetValue);
+    }
   }, [searchParams]);
 
   const handleSearch = (query: string) => setSearchQuery(query);
 
   const filteredProperties = useMemo(() => {
     return allProperties.filter((prop) => {
+      // Search query filter
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
         if (!prop.name.toLowerCase().includes(q) && !prop.location.toLowerCase().includes(q) && !prop.city.toLowerCase().includes(q))
           return false;
       }
+      
+      // Main location filter (from City dropdown)
       if (selectedLocation && prop.location !== selectedLocation) return false;
+      
+      // Property type filter (from Select Property dropdown)
+      if (propertyType) {
+        const typeLower = propertyType.toLowerCase();
+        if (typeLower.includes("bhk")) {
+          const bhkNum = typeLower.match(/(\d)\s*bhk/)?.[1];
+          if (bhkNum) {
+            const match = prop.bhkOptions.some((b) => b.toLowerCase().includes(`${bhkNum} bhk`));
+            if (!match) return false;
+          }
+        } else if (typeLower.includes("plot") && !prop.bhkOptions.some(b => b.toLowerCase().includes("plot"))) {
+          return false;
+        } else if (typeLower.includes("duplex") && !prop.bhkOptions.some(b => b.toLowerCase().includes("duplex"))) {
+          return false;
+        }
+      }
+
+      // Advanced filters: Sub-regions (areas)
+      if (selectedSubRegions.length > 0) {
+        if (!selectedSubRegions.includes(prop.location)) return false;
+      }
+
+      // Advanced filters: Configurations
+      if (selectedConfigs.length > 0) {
+        const match = selectedConfigs.some((cfg) => {
+          const cfgLower = cfg.toLowerCase();
+          if (cfgLower.includes("bhk")) {
+            const bhkNum = cfgLower.match(/(\d)\s*bhk/)?.[1];
+            if (bhkNum) {
+              return prop.bhkOptions.some((b) => b.toLowerCase().includes(`${bhkNum} bhk`));
+            }
+          }
+          return prop.bhkOptions.some((b) => b.toLowerCase().includes(cfgLower));
+        });
+        if (!match) return false;
+      }
+
+      // Advanced filters: Budget (budgetMaxCr from slider)
+      if (budgetMaxCr !== null) {
+        const maxBudget = budgetMaxCr * 10000000; // Convert Cr to rupees
+        if (prop.groupPrice > maxBudget) return false;
+      }
+
+      // Sidebar filters
+      if (possessionStatus) {
+        const poss = (prop.possession || "").toLowerCase();
+        const isReady =
+          poss.includes("ready") ||
+          poss.includes("2023") ||
+          poss.includes("2024") ||
+          poss.includes("2025");
+        const category = isReady ? "ready" : "under-construction";
+        if (possessionStatus === "ready" && category !== "ready") return false;
+        if (possessionStatus === "under-construction" && category !== "under-construction") return false;
+      }
       if (configurationType) {
         const match = prop.bhkOptions.some((b) => b.toLowerCase().includes(configurationType + " bhk"));
         if (!match) return false;
@@ -207,7 +289,7 @@ export default function PropertiesPage() {
       }
       return true;
     });
-  }, [searchQuery, selectedLocation, configurationType, budget, areaSqft]);
+  }, [searchQuery, selectedLocation, propertyType, selectedSubRegions, selectedConfigs, budgetMaxCr, possessionStatus, configurationType, budget, areaSqft]);
 
   // (Footer now sits naturally after content; dynamic top calculation removed)
 
@@ -222,6 +304,8 @@ export default function PropertiesPage() {
           searchQuery,
           onSearchChange: handleSearch,
           locationOptions: [...AHMEDABAD_LOCATIONS],
+          budget,
+          onBudgetChange: setBudget,
         }}
       />
 
@@ -239,7 +323,7 @@ export default function PropertiesPage() {
               </button>
 
               {/* Left Sidebar - Filters */}
-              <div className={`w-full lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-20 ${showMobileFilters ? 'block' : 'hidden lg:block'}`}>
+              <div className={`w-full lg:w-64 lg:flex-shrink-0 lg:sticky lg:top-32 mt-8 lg:mt-12 lg:ml-4 ${showMobileFilters ? 'block' : 'hidden lg:block'}`}>
                 <div className="bg-white rounded-xl border border-neutral-200 p-4 md:p-5">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold text-neutral-800" style={{ fontFamily: "var(--font-display)" }}>
@@ -254,23 +338,6 @@ export default function PropertiesPage() {
                   </div>
                   
                   <div className="space-y-5">
-                    {/* Location in Ahmedabad */}
-                    <div>
-                      <label className="block text-sm font-semibold text-neutral-700 mb-2">
-                        Location in Ahmedabad
-                      </label>
-                      <select
-                        value={selectedLocation}
-                        onChange={(e) => setSelectedLocation(e.target.value)}
-                        className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                      >
-                        <option value="">All Locations</option>
-                        {AHMEDABAD_LOCATIONS.map((loc) => (
-                          <option key={loc} value={loc}>{loc}</option>
-                        ))}
-                      </select>
-                    </div>
-
                     {/* Possession Status */}
                     <div>
                       <label className="block text-sm font-semibold text-neutral-700 mb-2">

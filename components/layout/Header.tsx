@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 import {
   Menu,
   X,
@@ -16,6 +17,15 @@ import {
   Mic,
   Bell,
   User,
+  ChevronDown,
+  LogOut,
+  FileText,
+  Heart,
+  CreditCard,
+  Tag,
+  BarChart3,
+  Bookmark,
+  GitCompare,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -43,12 +53,77 @@ interface HeaderProps {
     searchQuery: string;
     onSearchChange: (query: string) => void;
     locationOptions?: string[];
+    budget?: string;
+    onBudgetChange?: (value: string) => void;
   };
 }
 
+interface UserInfo {
+  phoneNumber: string;
+  name: string;
+}
+
 export default function Header({ onLoginClick, hideNavigation = false, searchProps }: HeaderProps) {
+  const router = useRouter();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkUserLogin = () => {
+      if (typeof window !== "undefined") {
+        const userStr = window.sessionStorage.getItem("nearhood_user");
+        if (userStr) {
+          try {
+            setUserInfo(JSON.parse(userStr));
+          } catch (e) {
+            setUserInfo(null);
+          }
+        } else {
+          setUserInfo(null);
+        }
+      }
+    };
+
+    checkUserLogin();
+    // Listen for login events
+    window.addEventListener("userLoggedIn", checkUserLogin);
+    return () => window.removeEventListener("userLoggedIn", checkUserLogin);
+  }, []);
+
+  const handleLogout = () => {
+    if (typeof window !== "undefined") {
+      window.sessionStorage.removeItem("nearhood_user");
+      window.sessionStorage.removeItem("nearhood_admin");
+      window.sessionStorage.removeItem("nearhood_vendor");
+    }
+    setUserInfo(null);
+    setIsUserDropdownOpen(false);
+    router.refresh();
+  };
+
+  const formatPhoneNumber = (phone: string) => {
+    if (phone.length === 10) {
+      return `+91 ${phone.slice(0, 5)} ${phone.slice(5)}`;
+    }
+    return `+91 ${phone}`;
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    if (isUserDropdownOpen) {
+      const handleClickOutside = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        if (!target.closest(".user-dropdown-container")) {
+          setIsUserDropdownOpen(false);
+        }
+      };
+      window.addEventListener("click", handleClickOutside);
+      return () => window.removeEventListener("click", handleClickOutside);
+    }
+  }, [isUserDropdownOpen]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -87,9 +162,9 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
               <Image
                 src="/images/logo.png"
                 alt="Nearhood"
-                width={480}
-                height={140}
-                className="h-20 sm:h-24 md:h-28 w-auto"
+                width={576}
+                height={168}
+                className="h-24 sm:h-28 md:h-32 w-auto"
                 priority
               />
             </Link>
@@ -97,7 +172,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
             {/* Search Bar in Header when hideNavigation is true */}
             {hideNavigation && searchProps && (
               <div className="flex-1 min-w-0 px-2 sm:px-4">
-                <div className="rounded-3xl bg-white shadow-lg shadow-primary-100/70 border border-primary-100/70 px-4 py-3 md:px-6 md:py-4 flex flex-col md:flex-row md:items-center gap-3 md:gap-4">
+                <div className="flex items-center gap-3 md:gap-4 px-2 md:px-0 py-1.5 md:py-2">
                   {/* City */}
                   <div className="w-full md:w-[32%]">
                     <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400 mb-1">
@@ -157,12 +232,16 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                       <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400 mb-1">
                         Budget &amp; More Filters
                       </p>
-                      <select className="w-full md:w-[180px] px-3 py-2.5 rounded-2xl border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300">
-                        <option>Budget &amp; More Filters</option>
-                        <option>Under ₹1 Cr</option>
-                        <option>₹1-5 Cr</option>
-                        <option>₹5-10 Cr</option>
-                        <option>Above ₹10 Cr</option>
+                      <select
+                        value={searchProps.budget ?? ""}
+                        onChange={(e) => searchProps.onBudgetChange?.(e.target.value)}
+                        className="w-full md:w-[180px] px-3 py-2.5 rounded-2xl border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
+                      >
+                        <option value="">Budget &amp; More Filters</option>
+                        <option value="under-1">Under ₹1 Cr</option>
+                        <option value="1-5">₹1-5 Cr</option>
+                        <option value="5-10">₹5-10 Cr</option>
+                        <option value="above-10">Above ₹10 Cr</option>
                       </select>
                     </div>
 
@@ -198,12 +277,166 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                   >
                     For Developers
                   </Link>
-                  <button
-                    onClick={onLoginClick}
-                    className="px-4 py-1.5 text-sm font-semibold rounded-full bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
-                  >
-                    Login
-                  </button>
+                  {userInfo ? (
+                    <div className="relative user-dropdown-container">
+                      <button
+                        onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                        className="relative flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-100 transition-colors"
+                      >
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white">
+                          <User className="w-5 h-5" />
+                        </div>
+                        <div className="w-5 h-5 rounded-full bg-white border-2 border-neutral-200 flex items-center justify-center absolute -bottom-0.5 -right-0.5">
+                          <ChevronDown className="w-3 h-3 text-neutral-600" />
+                        </div>
+                      </button>
+
+                      {/* Dropdown Menu */}
+                      <AnimatePresence>
+                        {isUserDropdownOpen && (
+                          <motion.div
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            transition={{ duration: 0.2 }}
+                            className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-2xl border border-neutral-200 overflow-hidden z-50"
+                          >
+                            {/* User Info Header */}
+                            <div className="px-4 py-3 border-b border-neutral-100 bg-neutral-50">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center">
+                                  <User className="w-5 h-5 text-neutral-600" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-semibold text-neutral-900 truncate">{userInfo.name}</p>
+                                  <p className="text-xs text-neutral-500 truncate">{formatPhoneNumber(userInfo.phoneNumber)}</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Menu Items */}
+                            <div className="py-2 max-h-[400px] overflow-y-auto">
+                              {/* Navigation Section */}
+                              <div className="px-2 py-1">
+                                <Link
+                                  href="/"
+                                  onClick={() => setIsUserDropdownOpen(false)}
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                >
+                                  <Home className="w-4 h-4" />
+                                  <span>Home</span>
+                                </Link>
+                                <Link
+                                  href="/properties"
+                                  onClick={() => setIsUserDropdownOpen(false)}
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                >
+                                  <Building2 className="w-4 h-4" />
+                                  <span>Properties</span>
+                                </Link>
+                                <Link
+                                  href="/about"
+                                  onClick={() => setIsUserDropdownOpen(false)}
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                >
+                                  <Users className="w-4 h-4" />
+                                  <span>About Us</span>
+                                </Link>
+                                <Link
+                                  href="/contact"
+                                  onClick={() => setIsUserDropdownOpen(false)}
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                >
+                                  <Phone className="w-4 h-4" />
+                                  <span>Contact Us</span>
+                                </Link>
+                              </div>
+
+                              <div className="border-t border-neutral-100 my-1"></div>
+
+                              {/* Groups & Subscription Section */}
+                              <div className="px-2 py-1">
+                                <Link
+                                  href="#"
+                                  onClick={() => setIsUserDropdownOpen(false)}
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                >
+                                  <Users className="w-4 h-4" />
+                                  <span>Your Groups</span>
+                                </Link>
+                                <Link
+                                  href="#"
+                                  onClick={() => setIsUserDropdownOpen(false)}
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                >
+                                  <Bell className="w-4 h-4" />
+                                  <span>Subscribe</span>
+                                </Link>
+                                <Link
+                                  href="#"
+                                  onClick={() => setIsUserDropdownOpen(false)}
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                >
+                                  <GitCompare className="w-4 h-4" />
+                                  <span>Compare</span>
+                                </Link>
+                              </div>
+
+                              <div className="border-t border-neutral-100 my-1"></div>
+
+                              {/* Financial/Tracking Section */}
+                              <div className="px-2 py-1">
+                                <Link
+                                  href="#"
+                                  onClick={() => setIsUserDropdownOpen(false)}
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                >
+                                  <CreditCard className="w-4 h-4" />
+                                  <span>Transactions</span>
+                                </Link>
+                                <Link
+                                  href="#"
+                                  onClick={() => setIsUserDropdownOpen(false)}
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                >
+                                  <Tag className="w-4 h-4" />
+                                  <span>Coupons</span>
+                                </Link>
+                                <Link
+                                  href="#"
+                                  onClick={() => setIsUserDropdownOpen(false)}
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                >
+                                  <Heart className="w-4 h-4" />
+                                  <span>Shortlisted</span>
+                                </Link>
+                              </div>
+
+                              <div className="border-t border-neutral-100 my-1"></div>
+
+                              {/* Logout */}
+                              <div className="px-2 py-1">
+                                <button
+                                  onClick={handleLogout}
+                                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                >
+                                  <LogOut className="w-4 h-4" />
+                                  <span>Logout</span>
+                                </button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={onLoginClick}
+                      className="px-4 py-1.5 text-sm font-semibold rounded-full bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
+                    >
+                      Login
+                    </button>
+                  )}
                 </div>
 
                 {/* Mobile Menu Button */}
@@ -227,15 +460,168 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                   <Bell className="w-5 h-5" />
                   <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                 </button>
-                <button className="p-2 rounded-lg text-neutral-600 hover:bg-neutral-100 transition-colors">
-                  <User className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={onLoginClick}
-                  className="px-4 py-1.5 text-sm font-semibold rounded-full bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
-                >
-                  Login
-                </button>
+                
+                {/* User Icon with Dropdown */}
+                {userInfo ? (
+                  <div className="relative user-dropdown-container">
+                    <button
+                      onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                      className="relative flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-100 transition-colors"
+                    >
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white">
+                        <User className="w-5 h-5" />
+                      </div>
+                      <div className="w-5 h-5 rounded-full bg-white border-2 border-neutral-200 flex items-center justify-center absolute -bottom-0.5 -right-0.5">
+                        <ChevronDown className="w-3 h-3 text-neutral-600" />
+                      </div>
+                    </button>
+
+                    {/* Dropdown Menu */}
+                    <AnimatePresence>
+                      {isUserDropdownOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-2xl border border-neutral-200 overflow-hidden z-50"
+                        >
+                          {/* User Info Header */}
+                          <div className="px-4 py-3 border-b border-neutral-100 bg-neutral-50">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center">
+                                <User className="w-5 h-5 text-neutral-600" />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-neutral-900 truncate">{userInfo.name}</p>
+                                <p className="text-xs text-neutral-500 truncate">{formatPhoneNumber(userInfo.phoneNumber)}</p>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Menu Items */}
+                          <div className="py-2 max-h-[400px] overflow-y-auto">
+                            {/* Navigation Section */}
+                            <div className="px-2 py-1">
+                              <Link
+                                href="/"
+                                onClick={() => setIsUserDropdownOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                              >
+                                <Home className="w-4 h-4" />
+                                <span>Home</span>
+                              </Link>
+                              <Link
+                                href="/properties"
+                                onClick={() => setIsUserDropdownOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                              >
+                                <Building2 className="w-4 h-4" />
+                                <span>Properties</span>
+                              </Link>
+                              <Link
+                                href="/about"
+                                onClick={() => setIsUserDropdownOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                              >
+                                <Users className="w-4 h-4" />
+                                <span>About Us</span>
+                              </Link>
+                              <Link
+                                href="/contact"
+                                onClick={() => setIsUserDropdownOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                              >
+                                <Phone className="w-4 h-4" />
+                                <span>Contact Us</span>
+                              </Link>
+                            </div>
+
+                            <div className="border-t border-neutral-100 my-1"></div>
+
+                            {/* Groups & Subscription Section */}
+                            <div className="px-2 py-1">
+                              <Link
+                                href="#"
+                                onClick={() => setIsUserDropdownOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                              >
+                                <Users className="w-4 h-4" />
+                                <span>Your Groups</span>
+                              </Link>
+                              <Link
+                                href="#"
+                                onClick={() => setIsUserDropdownOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                              >
+                                <Bell className="w-4 h-4" />
+                                <span>Subscribe</span>
+                              </Link>
+                              <Link
+                                href="#"
+                                onClick={() => setIsUserDropdownOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                              >
+                                <Compare className="w-4 h-4" />
+                                <span>Compare</span>
+                              </Link>
+                            </div>
+
+                            <div className="border-t border-neutral-100 my-1"></div>
+
+                            {/* Financial/Tracking Section */}
+                            <div className="px-2 py-1">
+                              <Link
+                                href="#"
+                                onClick={() => setIsUserDropdownOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                              >
+                                <CreditCard className="w-4 h-4" />
+                                <span>Transactions</span>
+                              </Link>
+                              <Link
+                                href="#"
+                                onClick={() => setIsUserDropdownOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                              >
+                                <Tag className="w-4 h-4" />
+                                <span>Coupons</span>
+                              </Link>
+                              <Link
+                                href="#"
+                                onClick={() => setIsUserDropdownOpen(false)}
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                              >
+                                <Heart className="w-4 h-4" />
+                                <span>Shortlisted</span>
+                              </Link>
+                            </div>
+
+                            <div className="border-t border-neutral-100 my-1"></div>
+
+                            {/* Logout */}
+                            <div className="px-2 py-1">
+                              <button
+                                onClick={handleLogout}
+                                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors"
+                              >
+                                <LogOut className="w-4 h-4" />
+                                <span>Logout</span>
+                              </button>
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                ) : (
+                  <button
+                    onClick={onLoginClick}
+                    className="px-4 py-1.5 text-sm font-semibold rounded-full bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-md hover:shadow-lg transition-all duration-200"
+                  >
+                    Login
+                  </button>
+                )}
               </div>
             )}
           </nav>
