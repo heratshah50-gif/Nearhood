@@ -27,16 +27,18 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
   const [isLoading, setIsLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
+  const [generatedOTP, setGeneratedOTP] = useState<string | null>(null);
 
   // Reset state when modal closes
   useEffect(() => {
     if (!isOpen) {
       setTimeout(() => {
-        setStep("phone");
-        setPhoneNumber("");
-        setIsLoading(false);
-        setResendTimer(30);
-        setCanResend(false);
+      setStep("phone");
+      setPhoneNumber("");
+      setIsLoading(false);
+      setResendTimer(30);
+      setCanResend(false);
+      setGeneratedOTP(null);
       }, 300);
     }
   }, [isOpen]);
@@ -92,9 +94,10 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
         return;
       }
 
-      // In development, log OTP to console for testing
+      // Store and display OTP for testing (until SMS is configured)
       if (data.otp) {
-        console.log(`[DEV] OTP for ${phoneNumber}: ${data.otp}`);
+        setGeneratedOTP(data.otp);
+        console.log(`[OTP] Your OTP is: ${data.otp}`);
       }
 
       setIsLoading(false);
@@ -103,7 +106,8 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
       setCanResend(false);
     } catch (error) {
       console.error("Error sending OTP:", error);
-      alert("Failed to send OTP. Please try again.");
+      const errorMessage = error instanceof Error ? error.message : "Network error";
+      alert(`Failed to send OTP: ${errorMessage}. Please check your connection and try again.`);
       setIsLoading(false);
     }
   };
@@ -202,9 +206,10 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
         return;
       }
 
-      // In development, log OTP to console for testing
+      // Store and display OTP for testing (until SMS is configured)
       if (data.otp) {
-        console.log(`[DEV] Resent OTP for ${phoneNumber}: ${data.otp}`);
+        setGeneratedOTP(data.otp);
+        console.log(`[OTP] Your OTP is: ${data.otp}`);
       }
 
       setIsLoading(false);
@@ -348,9 +353,25 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
                       transition={{ duration: 0.2 }}
                     >
                       <div className="mb-6">
-                        <p className="text-sm text-neutral-600 text-center mb-6">
+                        <p className="text-sm text-neutral-600 text-center mb-4">
                           Enter the 6-digit code sent to your phone
                         </p>
+                        
+                        {/* Display OTP for testing (until SMS is configured) */}
+                        {generatedOTP && (
+                          <div className="mb-4 p-3 bg-primary-50 border border-primary-200 rounded-lg">
+                            <p className="text-xs text-primary-700 font-medium mb-1 text-center">
+                              Your OTP (for testing):
+                            </p>
+                            <p className="text-2xl font-bold text-primary-600 text-center tracking-widest">
+                              {generatedOTP}
+                            </p>
+                            <p className="text-xs text-primary-600 text-center mt-1">
+                              Check console for OTP: {generatedOTP}
+                            </p>
+                          </div>
+                        )}
+                        
                         <OTPInput
                           length={6}
                           onComplete={handleOTPComplete}

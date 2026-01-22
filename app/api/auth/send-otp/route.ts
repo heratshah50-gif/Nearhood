@@ -101,8 +101,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: "OTP sent successfully",
-      // In development, return OTP for testing (remove in production)
-      ...(process.env.NODE_ENV === "development" && { otp }),
+      // Return OTP for testing (remove in production when SMS is configured)
+      otp, // Always return OTP for now until SMS service is configured
     });
   } catch (error) {
     console.error("Error in send-otp API:", error);
