@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import Hero from "@/components/sections/Hero";
-import PropertySearch from "@/components/sections/PropertySearch";
 import Properties from "@/components/sections/Properties";
 import PopularLocations from "@/components/sections/PopularLocations";
 import WhyInvest from "@/components/sections/WhyInvest";
@@ -26,11 +25,8 @@ export default function Home() {
     <main className="min-h-screen bg-neutral-50 overflow-x-hidden">
       <Header onLoginClick={() => setIsLoginModalOpen(true)} />
 
-      {/* Hero with integrated search (Flatsdekho style) */}
+      {/* Hero Section */}
       <Hero />
-
-      {/* Property Search Section */}
-      <PropertySearch />
 
       {/* Featured Properties - exclusive by our team */}
       <Properties />

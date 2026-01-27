@@ -7,9 +7,9 @@ import { CheckCircle2 } from "lucide-react";
 const points = [
   "We have a deep passion and commitment that reflect trust and transparency in every group deal.",
   "We offer reliable transactions with complete transparency for complete customer satisfaction.",
-  "We focus on constantly identifying new projects and builders for sustainable savings.",
+  "We focus on constantly identifying new items and suppliers for sustainable savings.",
   "We maintain the highest level of professionalism, followed by dedicated customer support.",
-  "Our group buying model helps generations of families save on their dream homes.",
+  "Our group buying model helps generations of families save on their bulk buy items.",
 ];
 
 export default function WhatMakesUnique() {
@@ -32,7 +32,7 @@ export default function WhatMakesUnique() {
             What Makes the Nearhood Platform Unique?
           </h2>
           <p className="text-neutral-500">
-            One platform that leads to trusted group buying and real savings on property
+            One platform that leads to trusted group buying and real savings on bulk buy items
           </p>
         </motion.div>
 
@@ -56,8 +56,8 @@ export default function WhatMakesUnique() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="text-center mt-10 text-neutral-600 max-w-2xl mx-auto"
         >
-          Nearhood has helped thousands of clients find the ideal home with group discounts. 
-          Whether you&apos;re looking for an affordable flat or a luxury apartment, we have options that suit your needs.
+          Nearhood has helped thousands of clients find ideal bulk buy items with group discounts. 
+          Whether you&apos;re looking for affordable items or premium products, we have options that suit your needs.
         </motion.p>
       </div>
     </section>

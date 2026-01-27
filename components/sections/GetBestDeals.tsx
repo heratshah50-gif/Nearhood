@@ -18,28 +18,28 @@ import Link from "next/link";
 const deals = [
   {
     icon: Lightbulb,
-    title: "Best Suggestions for Property",
-    desc: "If you want to buy or invest in real estate, we guarantee the best group deals according to your requirements and budget.",
+    title: "Best Suggestions for Bulk Buy Items",
+    desc: "If you want to buy or invest in bulk buy items, we guarantee the best group deals according to your requirements and budget.",
   },
   {
     icon: Home,
-    title: "Help in Selling Real Estate",
-    desc: "We help you sell commercial and residential real estate and secure the best price for your property.",
+    title: "Help in Selling Items",
+    desc: "We help you sell your items through group buying and secure the best price for your bulk buy items.",
   },
   {
     icon: MessageCircle,
     title: "Expert Advice",
-    desc: "Expert advice on group buying, RERA compliance, and negotiation. We help you choose the right property with confidence.",
+    desc: "Expert advice on group buying, quality assurance, and negotiation. We help you choose the right bulk buy items with confidence.",
   },
 ];
 
 const benefits = [
-  { icon: IndianRupee, title: "Price performance ratio", desc: "Group buying delivers the best value—save up to 20% on property prices." },
-  { icon: Clock, title: "Timely possession", desc: "Strong delivery track record. We help you get your dream home on time and hassle-free." },
+  { icon: IndianRupee, title: "Price performance ratio", desc: "Group buying delivers the best value—save up to 20% on bulk buy items." },
+  { icon: Clock, title: "Timely delivery", desc: "Strong delivery track record. We help you get your bulk buy items on time and hassle-free." },
   { icon: Shield, title: "Transparent", desc: "Charges are clear with no hidden payments. Full transparency in every deal." },
-  { icon: Award, title: "Commitment to quality", desc: "We focus on RERA-verified projects and trusted builders for every listing." },
-  { icon: Layout, title: "Functional design", desc: "Properties with smart layouts and modern architecture for a better lifestyle." },
-  { icon: BarChart3, title: "High utilization", desc: "Efficient processes and support so you can focus on your new home." },
+  { icon: Award, title: "Commitment to quality", desc: "We focus on verified items and trusted suppliers for every listing." },
+  { icon: Layout, title: "Quality assurance", desc: "Bulk buy items with quality checks and modern standards for better value." },
+  { icon: BarChart3, title: "High utilization", desc: "Efficient processes and support so you can focus on your purchases." },
 ];
 
 export default function GetBestDeals() {
@@ -113,7 +113,7 @@ export default function GetBestDeals() {
             Why Choose Nearhood
           </h3>
           <p className="text-neutral-500">
-            Nearhood connects you directly with verified properties, trusted developers and curated group deals.
+            Nearhood connects you directly with verified bulk buy items, trusted suppliers and curated group deals.
           </p>
         </motion.div>
 

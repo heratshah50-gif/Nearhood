@@ -42,6 +42,55 @@ export default function PropertyDetailPage({ params }: PropertyDetailPageProps) 
   const router = useRouter();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [userInfo, setUserInfo] = useState<any>(null);
+
+  // Check if user is logged in
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userStr = window.sessionStorage.getItem("nearhood_user");
+      if (userStr) {
+        try {
+          setUserInfo(JSON.parse(userStr));
+        } catch (e) {
+          setUserInfo(null);
+        }
+      } else {
+        setUserInfo(null);
+        // Show login modal if not logged in
+        setIsLoginModalOpen(true);
+      }
+    }
+  }, []);
+
+  // Listen for login events
+  useEffect(() => {
+    const checkUserLogin = () => {
+      if (typeof window !== "undefined") {
+        const userStr = window.sessionStorage.getItem("nearhood_user");
+        if (userStr) {
+          try {
+            setUserInfo(JSON.parse(userStr));
+            setIsLoginModalOpen(false);
+          } catch (e) {
+            setUserInfo(null);
+          }
+        } else {
+          setUserInfo(null);
+        }
+      }
+    };
+    window.addEventListener("userLoggedIn", checkUserLogin);
+    return () => window.removeEventListener("userLoggedIn", checkUserLogin);
+  }, []);
+
+  const handleJoinGroup = () => {
+    if (!userInfo) {
+      setIsLoginModalOpen(true);
+    } else {
+      // User is logged in, proceed with joining group
+      // Add your join group logic here
+    }
+  };
 
   const property = findPropertyBySlug(params.slug);
 
@@ -86,6 +135,17 @@ export default function PropertyDetailPage({ params }: PropertyDetailPageProps) 
     <div className="min-h-screen bg-neutral-50 flex flex-col">
       <Header onLoginClick={() => setIsLoginModalOpen(true)} />
 
+      {/* Show login modal if not logged in, hide content */}
+      {!userInfo && (
+        <main className="flex-1 flex items-center justify-center pt-24">
+          <div className="text-center">
+            <p className="text-lg text-neutral-700 mb-4">Please log in to view property details</p>
+          </div>
+        </main>
+      )}
+
+      {/* Show property content only if logged in */}
+      {userInfo && (
       <main className="flex-1">
         <div className="container-custom pt-24 md:pt-28 lg:pt-32 pb-4 md:pb-6">
           {/* Return to listings button below header */}
@@ -236,7 +296,10 @@ export default function PropertyDetailPage({ params }: PropertyDetailPageProps) 
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-2 mt-3">
-                        <button className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-red-500 text-white text-sm font-semibold shadow hover:bg-red-600 transition-colors">
+                        <button 
+                          onClick={handleJoinGroup}
+                          className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-red-500 text-white text-sm font-semibold shadow hover:bg-red-600 transition-colors"
+                        >
                           Join this group deal
                         </button>
                         <button className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-sm font-medium text-neutral-800 hover:bg-neutral-50">
@@ -312,7 +375,10 @@ export default function PropertyDetailPage({ params }: PropertyDetailPageProps) 
                   {joinedMembers}/{property.groupSize}
                 </p>
                 <p className="mt-1 text-sm text-neutral-500">Joined the Group</p>
-                <button className="mt-4 inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-primary-500 text-white text-sm md:text-base font-semibold shadow hover:bg-primary-600 transition-colors">
+                <button 
+                  onClick={handleJoinGroup}
+                  className="mt-4 inline-flex items-center justify-center px-5 py-2.5 rounded-full bg-primary-500 text-white text-sm md:text-base font-semibold shadow hover:bg-primary-600 transition-colors"
+                >
                   Join Group
                 </button>
               </div>
@@ -518,6 +584,7 @@ export default function PropertyDetailPage({ params }: PropertyDetailPageProps) 
 
         </div>
       </main>
+      )}
 
       <Footer hideSubscribe />
 

@@ -28,6 +28,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
   const [resendTimer, setResendTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
   const [generatedOTP, setGeneratedOTP] = useState<string | null>(null);
+  const [verificationAttempted, setVerificationAttempted] = useState(false);
 
   // Reset state when modal closes
   useEffect(() => {
@@ -42,6 +43,13 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
       }, 300);
     }
   }, [isOpen]);
+
+  // Reset verification state when step changes to OTP
+  useEffect(() => {
+    if (step === "otp") {
+      setVerificationAttempted(false);
+    }
+  }, [step]);
 
   // Resend timer countdown
   useEffect(() => {
@@ -100,10 +108,14 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
         console.log(`[OTP] Your OTP is: ${data.otp}`);
       }
 
+      // Small delay to ensure OTP is stored on server before allowing verification
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       setIsLoading(false);
       setStep("otp");
       setResendTimer(30);
       setCanResend(false);
+      setVerificationAttempted(false);
     } catch (error) {
       console.error("Error sending OTP:", error);
       const errorMessage = error instanceof Error ? error.message : "Network error";
@@ -113,21 +125,46 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
   };
 
   const handleOTPComplete = async (otp: string) => {
+    // Prevent multiple calls
+    if (isLoading || verificationAttempted) return;
+    
     setIsLoading(true);
+    setVerificationAttempted(true);
+    
+    // Ensure OTP is a clean string (remove any whitespace, ensure 6 digits)
+    const cleanOTP = String(otp).trim().replace(/\s/g, "");
+    
+    // Validate OTP format
+    if (cleanOTP.length !== 6 || !/^\d{6}$/.test(cleanOTP)) {
+      alert("Please enter a valid 6-digit OTP.");
+      setIsLoading(false);
+      setVerificationAttempted(false);
+      return;
+    }
+    
+    // Small delay to ensure OTP is fully stored on server and state is stable
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     try {
+      console.log(`[OTP Client] Verifying OTP for ${phoneNumber}: ${cleanOTP}`);
+      
       const response = await fetch("/api/auth/verify-otp", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ phoneNumber, otp }),
+        body: JSON.stringify({ phoneNumber, otp: cleanOTP }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        console.error(`[OTP Client] Verification failed: ${data.error}`);
         alert(data.error || "Invalid OTP. Please try again.");
         setIsLoading(false);
+        setVerificationAttempted(false);
+        // Force remount of OTP input to reset its state
+        setStep("otp");
         return;
       }
 
@@ -182,6 +219,9 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
       console.error("Error verifying OTP:", error);
       alert("Failed to verify OTP. Please try again.");
       setIsLoading(false);
+      setVerificationAttempted(false);
+      // Force remount of OTP input to reset its state
+      setStep("otp");
     }
   };
 
@@ -212,13 +252,18 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
         console.log(`[OTP] Your OTP is: ${data.otp}`);
       }
 
+      // Small delay to ensure OTP is stored on server
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       setIsLoading(false);
       setResendTimer(30);
       setCanResend(false);
+      setVerificationAttempted(false);
     } catch (error) {
       console.error("Error resending OTP:", error);
       alert("Failed to resend OTP. Please try again.");
       setIsLoading(false);
+      setVerificationAttempted(false);
     }
   };
 
@@ -373,6 +418,7 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
                         )}
                         
                         <OTPInput
+                          key={`${step}-${verificationAttempted}`} // Force remount when step changes or after failed verification
                           length={6}
                           onComplete={handleOTPComplete}
                           disabled={isLoading}

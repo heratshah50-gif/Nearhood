@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// In-memory storage for OTP (in production, use Redis or database)
-const otpStore = new Map<string, { otp: string; expiresAt: number }>();
+// Declare global type for OTP store to persist across hot reloads
+declare global {
+  var otpStore: Map<string, { otp: string; expiresAt: number }> | undefined;
+}
+
+// Use global variable to persist OTP store across hot module reloads in development
+// In production, use Redis or database instead
+const otpStore = global.otpStore || new Map<string, { otp: string; expiresAt: number }>();
+
+// Persist the store globally (important for Next.js dev mode with HMR)
+if (process.env.NODE_ENV !== 'production') {
+  global.otpStore = otpStore;
+}
 
 // Generate 6-digit OTP
 function generateOTP(): string {
@@ -73,8 +84,11 @@ export async function POST(request: NextRequest) {
   try {
     const { phoneNumber } = await request.json();
 
+    // Normalize phone number (remove any non-digits, ensure it's exactly 10 digits)
+    const normalizedPhone = String(phoneNumber).replace(/\D/g, "");
+    
     // Validate phone number
-    if (!phoneNumber || phoneNumber.length !== 10 || !/^\d{10}$/.test(phoneNumber)) {
+    if (!normalizedPhone || normalizedPhone.length !== 10 || !/^\d{10}$/.test(normalizedPhone)) {
       return NextResponse.json(
         { error: "Invalid phone number" },
         { status: 400 }
@@ -85,11 +99,12 @@ export async function POST(request: NextRequest) {
     const otp = generateOTP();
     const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes expiry
 
-    // Store OTP
-    otpStore.set(phoneNumber, { otp, expiresAt });
+    // Store OTP using normalized phone number
+    otpStore.set(normalizedPhone, { otp, expiresAt });
+    console.log(`[OTP Storage] Stored OTP for ${normalizedPhone}: ${otp}, Expires at: ${new Date(expiresAt).toISOString()}`);
 
     // Send OTP via SMS
-    const sent = await sendOTPviaSMS(phoneNumber, otp);
+    const sent = await sendOTPviaSMS(normalizedPhone, otp);
 
     if (!sent) {
       return NextResponse.json(
@@ -113,16 +128,4 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Export OTP store for verification (in production, use Redis/database)
-export function getStoredOTP(phoneNumber: string): string | null {
-  const stored = otpStore.get(phoneNumber);
-  if (!stored || Date.now() > stored.expiresAt) {
-    otpStore.delete(phoneNumber);
-    return null;
-  }
-  return stored.otp;
-}
-
-export function deleteStoredOTP(phoneNumber: string): void {
-  otpStore.delete(phoneNumber);
-}
+// Note: OTP verification now uses the global.otpStore directly in verify-otp/route.ts

@@ -38,10 +38,10 @@ export default function SignupCTA() {
             className="text-2xl lg:text-4xl font-bold text-white mb-4"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            Join a Group & Save on Your Dream Home
+            Join a Group & Save on Bulk Buy Items
           </h2>
           <p className="text-white/90 text-base lg:text-lg mb-8 max-w-3xl">
-            We&apos;ll help you find the right property and group deal, and keep you updated on new group discounts
+            We&apos;ll help you find the right bulk buy items and group deal, and keep you updated on new group discounts
             in Ahmedabad.
           </p>
 

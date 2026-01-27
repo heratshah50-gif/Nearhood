@@ -39,7 +39,7 @@ export default function PopularLocations() {
           >
             Most Popular Places
           </h2>
-          <p className="text-neutral-500">Find properties in these Ahmedabad locations with group buying deals</p>
+          <p className="text-neutral-500">Find bulk buy items in these Ahmedabad locations with group buying deals</p>
         </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -62,7 +62,7 @@ export default function PopularLocations() {
                     <h3 className="font-semibold text-neutral-800 group-hover:text-primary-700">
                       {loc.name}
                     </h3>
-                    <p className="text-sm text-neutral-500">{loc.count} Properties</p>
+                    <p className="text-sm text-neutral-500">{loc.count} Items</p>
                   </div>
                 </div>
                 <span className="text-primary-600 font-medium text-sm flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import {
   MapPin,
   Heart,
@@ -19,6 +20,9 @@ import {
   Sparkles,
 } from "lucide-react";
 import { getPropertyImage } from "@/lib/property-images";
+import { getPropertySlug } from "@/lib/properties-data";
+import { getProductsByCategory, VehicleProduct } from "@/lib/products-data";
+import { Car, Bike } from "lucide-react";
 
 interface Property {
   id: number;
@@ -56,6 +60,11 @@ const tabs = [
   { id: "new", label: "New Launches" },
 ];
 
+const groupTypes = [
+  { id: "properties", label: "Properties" },
+  { id: "vehicles", label: "Vehicles" },
+];
+
 function formatPrice(price: number): string {
   if (price >= 10000000) {
     return `₹${(price / 10000000).toFixed(2)} Cr`;
@@ -69,15 +78,17 @@ function PropertyCard({ property, index }: { property: Property; index: number }
   const isInView = useInView(cardRef, { once: true, amount: 0.2 });
 
   const progressPercent = ((property.groupSize - property.spotsLeft) / property.groupSize) * 100;
+  const propertySlug = getPropertySlug(property.name);
 
   return (
-    <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 30 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-neutral-100 w-full"
-    >
+    <Link href={`/properties/${propertySlug}`} className="flex w-full h-full">
+      <motion.div
+        ref={cardRef}
+        initial={{ opacity: 0, y: 30 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.5, delay: index * 0.1 }}
+        className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-neutral-100 w-full h-full flex flex-col cursor-pointer"
+      >
       {/* Image Section */}
       <div className="relative h-52 w-full bg-gradient-to-br from-primary-100 to-primary-200 overflow-hidden">
         {property.image ? (
@@ -120,9 +131,13 @@ function PropertyCard({ property, index }: { property: Property; index: number }
         )}
 
         {/* Action Buttons */}
-        <div className="absolute top-4 right-4 flex flex-col gap-2">
+        <div className="absolute top-4 right-4 flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
           <button
-            onClick={() => setIsLiked(!isLiked)}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsLiked(!isLiked);
+            }}
             className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
               isLiked
                 ? "bg-red-500 text-white"
@@ -134,11 +149,23 @@ function PropertyCard({ property, index }: { property: Property; index: number }
         </div>
 
         {/* Floating Action Buttons - Appear on Hover */}
-        <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button className="w-9 h-9 rounded-xl bg-white/95 backdrop-blur-sm flex items-center justify-center text-neutral-600 hover:bg-white transition-colors">
+        <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            className="w-9 h-9 rounded-xl bg-white/95 backdrop-blur-sm flex items-center justify-center text-neutral-600 hover:bg-white transition-colors"
+          >
             <Share2 className="w-4 h-4" />
           </button>
-          <button className="w-9 h-9 rounded-xl bg-white/95 backdrop-blur-sm flex items-center justify-center text-neutral-600 hover:bg-white transition-colors">
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            className="w-9 h-9 rounded-xl bg-white/95 backdrop-blur-sm flex items-center justify-center text-neutral-600 hover:bg-white transition-colors"
+          >
             <Scale className="w-4 h-4" />
           </button>
         </div>
@@ -204,7 +231,7 @@ function PropertyCard({ property, index }: { property: Property; index: number }
         </div>
 
         {/* Pricing */}
-        <div className="mb-4 p-3 rounded-xl bg-neutral-50 border border-neutral-100">
+        <div className="mb-3 p-3 rounded-xl bg-neutral-50 border border-neutral-100">
           <div className="flex items-end justify-between">
             <div>
               <p className="text-xs text-neutral-500 mb-0.5">Group Price</p>
@@ -232,7 +259,7 @@ function PropertyCard({ property, index }: { property: Property; index: number }
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-5 mt-2">
           <span className="text-xs text-neutral-400">
             {property.shortlisted} users shortlisted
           </span>
@@ -242,12 +269,24 @@ function PropertyCard({ property, index }: { property: Property; index: number }
         </div>
 
         {/* CTA Buttons */}
-        <div className="flex gap-2 mt-4">
-          <button className="flex-1 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-primary-500/25 transition-all flex items-center justify-center gap-2">
+        <div className="flex gap-2 mt-auto" onClick={(e) => e.stopPropagation()}>
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            className="flex-1 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-primary-500/25 transition-all flex items-center justify-center gap-2"
+          >
             Join Group
             <ArrowRight className="w-4 h-4" />
           </button>
-          <button className="w-12 h-12 rounded-xl border-2 border-primary-200 text-primary-600 hover:bg-primary-50 transition-colors flex items-center justify-center">
+          <button 
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            className="w-12 h-12 rounded-xl border-2 border-primary-200 text-primary-600 hover:bg-primary-50 transition-colors flex items-center justify-center"
+          >
             <Phone className="w-5 h-5" />
           </button>
         </div>
@@ -262,12 +301,211 @@ function PropertyCard({ property, index }: { property: Property; index: number }
         </div>
       )}
     </motion.div>
+    </Link>
+  );
+}
+
+function VehicleCard({ vehicle, index }: { vehicle: VehicleProduct; index: number }) {
+  const [isLiked, setIsLiked] = useState(false);
+  const cardRef = useRef(null);
+  const isInView = useInView(cardRef, { once: true, amount: 0.2 });
+
+  const progressPercent = ((vehicle.groupSize - vehicle.spotsLeft) / vehicle.groupSize) * 100;
+  const slug = vehicle.name.toLowerCase().replace(/\s+/g, "-");
+
+  return (
+    <Link href={`/vehicles/${vehicle.subcategory}/${slug}`} className="flex w-full h-full">
+      <motion.div
+        ref={cardRef}
+        initial={{ opacity: 0, y: 30 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.5, delay: index * 0.1 }}
+        className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-neutral-100 w-full h-full flex flex-col cursor-pointer"
+      >
+        {/* Image Section */}
+        <div className="relative h-52 w-full bg-gradient-to-br from-primary-100 to-primary-200 overflow-hidden">
+          {vehicle.image ? (
+            <Image
+              src={vehicle.image}
+              alt={vehicle.name}
+              fill
+              className="object-cover w-full h-full"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              unoptimized={vehicle.image.startsWith("http")}
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              {vehicle.subcategory === "car" ? (
+                <Car className="w-16 h-16 text-primary-500" />
+              ) : (
+                <Bike className="w-16 h-16 text-primary-500" />
+              )}
+            </div>
+          )}
+
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+
+          {/* Year Badge */}
+          <div className="absolute top-4 left-4">
+            <div className="px-3 py-1.5 rounded-lg bg-primary-500 text-white text-xs font-semibold">
+              {vehicle.year}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="absolute top-4 right-4 flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsLiked(!isLiked);
+              }}
+              className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
+                isLiked
+                  ? "bg-red-500 text-white"
+                  : "bg-white/95 backdrop-blur-sm text-neutral-600 hover:bg-white"
+              }`}
+            >
+              <Heart className={`w-4 h-4 ${isLiked ? "fill-current" : ""}`} />
+            </button>
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="p-5">
+          {/* Vehicle Name & Location */}
+          <div className="mb-3">
+            <h3
+              className="text-lg font-bold text-neutral-800 mb-1 line-clamp-1"
+              style={{ fontFamily: "var(--font-display)" }}
+            >
+              {vehicle.brand} {vehicle.model} {vehicle.year}
+            </h3>
+            <div className="flex items-center gap-1 text-neutral-500 text-sm">
+              <MapPin className="w-3.5 h-3.5" />
+              <span>{vehicle.location}, {vehicle.city}</span>
+            </div>
+          </div>
+
+          {/* Vehicle Details */}
+          <div className="flex flex-wrap gap-1.5 mb-4">
+            <span className="px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-600 text-xs font-medium">
+              {vehicle.fuelType}
+            </span>
+            <span className="px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-600 text-xs font-medium">
+              {vehicle.transmission}
+            </span>
+            {vehicle.mileage && (
+              <span className="px-2.5 py-1 rounded-md bg-neutral-100 text-neutral-600 text-xs font-medium">
+                {vehicle.mileage}
+              </span>
+            )}
+          </div>
+
+          {/* Group Status */}
+          <div className="mb-4 p-3 rounded-xl bg-primary-50/50 border border-primary-100">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <Users className="w-4 h-4 text-primary-600 flex-shrink-0" />
+                <span className="text-sm font-medium text-neutral-700 truncate">
+                  <span className="font-bold">{vehicle.groupSize - vehicle.spotsLeft}</span>/{vehicle.groupSize} joined
+                </span>
+              </div>
+              <span className={`text-xs font-semibold ${vehicle.spotsLeft <= 3 ? "text-red-500" : "text-green-600"}`}>
+                {vehicle.spotsLeft} spots left
+              </span>
+            </div>
+            {/* Progress Bar */}
+            <div className="h-2 bg-primary-100 rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercent}%` }}
+                transition={{ duration: 1, delay: 0.5 }}
+                className="h-full bg-gradient-to-r from-primary-400 to-primary-500 rounded-full"
+              />
+            </div>
+            <div className="flex items-center gap-1.5 mt-2 text-xs text-neutral-500">
+              <Clock className="w-3.5 h-3.5" />
+              <span>Closes on <span className="font-semibold text-neutral-700">{vehicle.deadline}</span></span>
+            </div>
+          </div>
+
+          {/* Pricing */}
+          <div className="mb-3 p-3 rounded-xl bg-neutral-50 border border-neutral-100">
+            <div className="flex items-end justify-between">
+              <div>
+                <p className="text-xs text-neutral-500 mb-0.5">Group Price</p>
+                <p className="text-xl font-bold text-neutral-800" style={{ fontFamily: "var(--font-display)" }}>
+                  {formatPrice(vehicle.groupPrice)}
+                </p>
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-neutral-400 line-through">
+                  {formatPrice(vehicle.marketPrice)}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center gap-1 px-2 py-1 rounded-md bg-green-100">
+                <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                <span className="text-xs font-semibold text-green-600">
+                  Save {vehicle.savingsPercent}%
+                </span>
+              </div>
+              <span className="text-xs text-neutral-500">
+                ≈ {formatPrice(vehicle.marketPrice - vehicle.groupPrice)} savings
+              </span>
+            </div>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="flex gap-2 mt-auto" onClick={(e) => e.stopPropagation()}>
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              className="flex-1 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-primary-500/25 transition-all flex items-center justify-center gap-2"
+            >
+              Join Group
+              <ArrowRight className="w-4 h-4" />
+            </button>
+            <button 
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              className="w-12 h-12 rounded-xl border-2 border-primary-200 text-primary-600 hover:bg-primary-50 transition-colors flex items-center justify-center"
+            >
+              <Phone className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Featured Badge */}
+        {vehicle.featured && (
+          <div className="absolute top-0 left-0">
+            <div className="bg-gradient-to-r from-amber-400 to-amber-500 text-white text-xs font-bold px-3 py-1 rounded-br-lg shadow-lg">
+              Featured
+            </div>
+          </div>
+        )}
+      </motion.div>
+    </Link>
   );
 }
 
 export default function Properties() {
   const [activeTab, setActiveTab] = useState("active");
+  const [activeGroupType, setActiveGroupType] = useState("properties");
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Get vehicles data
+  const vehicles = getProductsByCategory("vehicle") as VehicleProduct[];
+  
+  // Filter displayed items based on group type
+  const displayedItems = activeGroupType === "properties" ? properties : vehicles;
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -292,7 +530,7 @@ export default function Properties() {
               className="text-3xl lg:text-4xl font-bold text-neutral-800 mb-3"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              Featured Properties
+              Featured Groups
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 20 }}
@@ -301,11 +539,28 @@ export default function Properties() {
               transition={{ delay: 0.1 }}
               className="text-neutral-500 text-lg max-w-xl"
             >
-              Exclusive properties in Ahmedabad by our team with active group buying deals
+              Exclusive bulk buy items in Ahmedabad by our team with active group buying deals
             </motion.p>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
+            {/* Group Type Filters */}
+            <div className="flex bg-white rounded-xl p-1 shadow-sm border border-neutral-100">
+              {groupTypes.map((type) => (
+                <button
+                  key={type.id}
+                  onClick={() => setActiveGroupType(type.id)}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    activeGroupType === type.id
+                      ? "bg-primary-500 text-white shadow-md"
+                      : "text-neutral-600 hover:text-primary-600"
+                  }`}
+                >
+                  {type.label}
+                </button>
+              ))}
+            </div>
+
             {/* Tabs */}
             <div className="flex bg-white rounded-xl p-1 shadow-sm border border-neutral-100">
               {tabs.map((tab) => (
@@ -324,13 +579,13 @@ export default function Properties() {
             </div>
 
             {/* View All Link */}
-            <a
-              href="#"
+            <Link
+              href="/properties"
               className="hidden lg:flex items-center gap-1 text-primary-600 font-medium hover:text-primary-700 transition-colors"
             >
               View all
               <ArrowRight className="w-4 h-4" />
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -353,14 +608,18 @@ export default function Properties() {
           {/* Scrollable Container */}
           <div
             ref={scrollRef}
-            className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide lg:custom-scrollbar snap-x snap-mandatory"
+            className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide lg:custom-scrollbar snap-x snap-mandatory items-stretch"
           >
-            {properties.map((property, index) => (
+            {displayedItems.map((item, index) => (
               <div
-                key={property.id}
-                className="flex-shrink-0 w-[340px] snap-start min-w-[340px]"
+                key={item.id}
+                className="flex-shrink-0 w-[340px] snap-start min-w-[340px] flex"
               >
-                <PropertyCard property={property} index={index} />
+                {activeGroupType === "properties" ? (
+                  <PropertyCard property={item as Property} index={index} />
+                ) : (
+                  <VehicleCard vehicle={item as VehicleProduct} index={index} />
+                )}
               </div>
             ))}
           </div>
@@ -368,13 +627,13 @@ export default function Properties() {
 
         {/* Mobile View All */}
         <div className="lg:hidden mt-8 text-center">
-          <a
-            href="#"
+          <Link
+            href={activeGroupType === "properties" ? "/properties" : "/vehicles"}
             className="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-xl shadow-sm border border-neutral-200 text-primary-600 font-medium hover:bg-primary-50 transition-colors"
           >
-            View All Properties
+            View All {activeGroupType === "properties" ? "Properties" : "Vehicles"}
             <ArrowRight className="w-4 h-4" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

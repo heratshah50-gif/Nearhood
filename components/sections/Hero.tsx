@@ -2,9 +2,12 @@
 
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
-import { ArrowRight, Play, Users, IndianRupee, Building2, CheckCircle, TrendingUp, MapPin, Clock, Star } from "lucide-react";
+import { ArrowRight, Play, Users, IndianRupee, Building2, CheckCircle, TrendingUp, MapPin, Clock, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { getVehicleImage } from "@/lib/vehicle-images";
+import { ALL_PROPERTIES } from "@/lib/properties-data";
+import { getProductsByCategory, VehicleProduct } from "@/lib/products-data";
 
 interface CounterProps {
   end: number;
@@ -70,93 +73,273 @@ const stats = [
 ];
 
 const benefits = [
-  "Save up to 20% on property prices",
-  "Verified RERA compliant projects",
+  "Save up to 20% on bulk buy items",
+  "Verified and quality-assured items",
   "Expert negotiation support",
 ];
 
-// Floating cards data
-const floatingCards = [
-  {
-    id: 1,
-    type: "members",
-    icon: Users,
-    iconBg: "bg-primary-100",
-    iconColor: "text-primary-600",
-    avatars: true,
-    title: "12 Members",
-    subtitle: "Joined this group",
-  },
-  {
-    id: 2,
-    type: "savings",
-    icon: IndianRupee,
-    iconBg: "bg-green-100",
-    iconColor: "text-green-600",
-    title: "₹18.5 Lakhs",
-    subtitle: "Average Savings",
-    highlight: true,
-  },
-  {
-    id: 3,
-    type: "trending",
-    icon: TrendingUp,
-    iconBg: "bg-orange-100",
-    iconColor: "text-orange-600",
-    title: "15% Off",
-    subtitle: "Current Discount",
-  },
-  {
-    id: 4,
-    type: "location",
-    icon: MapPin,
-    iconBg: "bg-blue-100",
-    iconColor: "text-blue-600",
-    title: "SG Highway",
-    subtitle: "Prime Location, Ahmedabad",
-  },
-  {
-    id: 5,
-    type: "closing",
-    icon: Clock,
-    iconBg: "bg-red-100",
-    iconColor: "text-red-600",
-    title: "3 Days Left",
-    subtitle: "Group Closing Soon",
-  },
-  {
-    id: 6,
-    type: "rating",
-    icon: Star,
-    iconBg: "bg-amber-100",
-    iconColor: "text-amber-600",
-    title: "4.9 Rating",
-    subtitle: "Builder Score",
-  },
-];
+// Helper function to format price
+function formatPrice(price: number): string {
+  if (price >= 10000000) {
+    return `₹${(price / 10000000).toFixed(2)} Cr`;
+  }
+  if (price >= 100000) {
+    return `₹${(price / 100000).toFixed(1)} L`;
+  }
+  return `₹${(price / 1000).toFixed(0)}K`;
+}
+
+// Get dynamic floating cards based on image type
+function getFloatingCardsForImage(imageType: "property" | "vehicle", index: number) {
+  if (imageType === "property") {
+    const property = ALL_PROPERTIES[index % ALL_PROPERTIES.length];
+    const membersJoined = property.groupSize - property.spotsLeft;
+    const savings = property.marketPrice - property.groupPrice;
+    
+    return [
+      {
+        id: 1,
+        type: "members",
+        icon: Users,
+        iconBg: "bg-primary-100",
+        iconColor: "text-primary-600",
+        avatars: true,
+        title: `${membersJoined} Members`,
+        subtitle: "Joined this group",
+      },
+      {
+        id: 2,
+        type: "savings",
+        icon: IndianRupee,
+        iconBg: "bg-green-100",
+        iconColor: "text-green-600",
+        title: formatPrice(savings),
+        subtitle: "Average Savings",
+        highlight: true,
+      },
+      {
+        id: 3,
+        type: "location",
+        icon: MapPin,
+        iconBg: "bg-blue-100",
+        iconColor: "text-blue-600",
+        title: property.location,
+        subtitle: `Prime Location, ${property.city}`,
+      },
+    ];
+  } else {
+    const vehicles = getProductsByCategory("vehicle") as VehicleProduct[];
+    const vehicle = vehicles[index % vehicles.length];
+    const membersJoined = vehicle.groupSize - vehicle.spotsLeft;
+    const savings = vehicle.marketPrice - vehicle.groupPrice;
+    
+    return [
+      {
+        id: 1,
+        type: "members",
+        icon: Users,
+        iconBg: "bg-primary-100",
+        iconColor: "text-primary-600",
+        avatars: true,
+        title: `${membersJoined} Members`,
+        subtitle: "Joined this group",
+      },
+      {
+        id: 2,
+        type: "savings",
+        icon: IndianRupee,
+        iconBg: "bg-green-100",
+        iconColor: "text-green-600",
+        title: formatPrice(savings),
+        subtitle: "Average Savings",
+        highlight: true,
+      },
+      {
+        id: 3,
+        type: "location",
+        icon: MapPin,
+        iconBg: "bg-blue-100",
+        iconColor: "text-blue-600",
+        title: vehicle.location,
+        subtitle: `Available in ${vehicle.city}`,
+      },
+    ];
+  }
+}
 
 // Card positions around the image (alternating left and right)
 const cardPositions = [
-  { top: "10%", left: "0%", right: "auto" },      // top-left
-  { top: "15%", right: "0%", left: "auto" },       // top-right  
-  { top: "55%", left: "0%", right: "auto" },      // bottom-left
+  { top: "8%", left: "0%", right: "auto" },      // top-left - Members
+  { top: "12%", right: "0%", left: "auto" },     // top-right - Savings
+  { top: "60%", left: "0%", right: "auto" },    // bottom-left - Location
 ];
 
-export default function Hero() {
-  const [visibleCards, setVisibleCards] = useState<number[]>([0, 1, 2]);
-  const [heroCity] = useState("Ahmedabad");
-  const [heroProperty, setHeroProperty] = useState("");
-  const [propertyOpen, setPropertyOpen] = useState(false);
+// Image carousel component
+function ImageCarousel({ onImageChange }: { onImageChange?: (type: "property" | "vehicle", index: number) => void }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+
+  const carouselImages = [
+    {
+      type: "property" as const,
+      src: "/images/hero-building.png",
+      alt: "Premium residential property",
+      dataIndex: 0,
+    },
+    {
+      type: "vehicle" as const,
+      src: getVehicleImage("car", 0, "800x1000"),
+      alt: "Premium vehicle",
+      fallback: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=1000&fit=crop&auto=format&q=80",
+      dataIndex: 0,
+    },
+    {
+      type: "property" as const,
+      src: "/images/hero-building.png",
+      alt: "Premium residential property",
+      dataIndex: 1,
+    },
+    {
+      type: "vehicle" as const,
+      src: getVehicleImage("car", 1, "800x1000"),
+      alt: "Premium vehicle",
+      fallback: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=1000&fit=crop&auto=format&q=80",
+      dataIndex: 1,
+    },
+  ];
 
   useEffect(() => {
+    const currentImage = carouselImages[currentIndex];
+    if (currentImage && onImageChange) {
+      onImageChange(currentImage.type, currentImage.dataIndex);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex]);
+
+  const handleImageError = (index: number) => {
+    setImageErrors((prev) => ({ ...prev, [index]: true }));
+  };
+
+  const getImageSrc = (index: number) => {
+    const image = carouselImages[index];
+    if (imageErrors[index] && image.fallback) {
+      return image.fallback;
+    }
+    return image.src;
+  };
+
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+
     const interval = setInterval(() => {
-      setVisibleCards((prev) => {
-        const nextIndex = (prev[2] + 1) % floatingCards.length;
-        return [prev[1], prev[2], nextIndex];
-      });
-    }, 3000);
+      setCurrentIndex((prev) => (prev + 1) % carouselImages.length);
+    }, 4000); // Change image every 4 seconds
+
     return () => clearInterval(interval);
-  }, []);
+  }, [isAutoPlaying, carouselImages.length]);
+
+  const goToPrevious = () => {
+    setIsAutoPlaying(false);
+    setCurrentIndex((prev) => (prev - 1 + carouselImages.length) % carouselImages.length);
+  };
+
+  const goToNext = () => {
+    setIsAutoPlaying(false);
+    setCurrentIndex((prev) => (prev + 1) % carouselImages.length);
+  };
+
+  const goToSlide = (index: number) => {
+    setIsAutoPlaying(false);
+    setCurrentIndex(index);
+  };
+
+  return (
+    <div 
+      className="relative w-full h-full"
+      onMouseEnter={() => setIsAutoPlaying(false)}
+      onMouseLeave={() => setIsAutoPlaying(true)}
+    >
+      {/* Images */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentIndex}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.5 }}
+          className="absolute inset-0"
+        >
+          {getImageSrc(currentIndex).startsWith("http") ? (
+            <Image
+              src={getImageSrc(currentIndex)}
+              alt={carouselImages[currentIndex].alt}
+              fill
+              className="object-cover w-full h-full"
+              priority={currentIndex === 0}
+              sizes="(max-width: 1024px) 0vw, 50vw"
+              unoptimized={true}
+              onError={() => handleImageError(currentIndex)}
+            />
+          ) : (
+            <Image
+              src={getImageSrc(currentIndex)}
+              alt={carouselImages[currentIndex].alt}
+              fill
+              className="object-cover w-full h-full"
+              priority={currentIndex === 0}
+              sizes="(max-width: 1024px) 0vw, 50vw"
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Navigation Arrows */}
+      <button
+        onClick={goToPrevious}
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-neutral-700 hover:bg-white shadow-lg transition-all hover:scale-110"
+        aria-label="Previous image"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      <button
+        onClick={goToNext}
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-neutral-700 hover:bg-white shadow-lg transition-all hover:scale-110"
+        aria-label="Next image"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
+
+      {/* Dots Indicator */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+        {carouselImages.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => goToSlide(index)}
+            className={`w-2 h-2 rounded-full transition-all ${
+              index === currentIndex
+                ? "bg-white w-6"
+                : "bg-white/50 hover:bg-white/75"
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function Hero() {
+  const [currentImageType, setCurrentImageType] = useState<"property" | "vehicle">("property");
+  const [currentDataIndex, setCurrentDataIndex] = useState(0);
+  const [floatingCards, setFloatingCards] = useState(getFloatingCardsForImage("property", 0));
+
+  const handleImageChange = (type: "property" | "vehicle", index: number) => {
+    setCurrentImageType(type);
+    setCurrentDataIndex(index);
+    const newCards = getFloatingCardsForImage(type, index);
+    setFloatingCards(newCards);
+  };
 
 
   return (
@@ -200,7 +383,7 @@ export default function Hero() {
             <p className="text-base sm:text-lg md:text-xl text-neutral-600 mb-6 md:mb-8 max-w-lg leading-relaxed">
               Join thousands of smart buyers unlocking{" "}
               <span className="text-neutral-900 font-semibold">group discounts</span> on 
-              premium properties in Ahmedabad.
+              premium bulk buy items in Ahmedabad.
             </p>
 
             {/* Benefits List */}
@@ -229,7 +412,7 @@ export default function Hero() {
                   whileTap={{ scale: 0.98 }}
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 transition-all text-lg cursor-pointer"
                 >
-                  Explore Properties
+                  Explore Items
                   <ArrowRight className="w-5 h-5" />
                 </motion.div>
               </Link>
@@ -263,39 +446,31 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Right Content - Property Image */}
+          {/* Right Content - Image Carousel */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
             className="relative hidden lg:block overflow-visible"
           >
-            {/* Main Image Container */}
+            {/* Image Carousel Container */}
             <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/5] w-full max-w-full">
-              <Image
-                src="/images/hero-building.png"
-                alt="Premium residential property"
-                fill
-                className="object-cover w-full h-full"
-                priority
-                sizes="(max-width: 1024px) 0vw, 50vw"
-              />
+              <ImageCarousel onImageChange={handleImageChange} />
               
               {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent z-10 pointer-events-none" />
             </div>
 
-            {/* Floating Cards - Rotating */}
-            <div className="absolute inset-0 pointer-events-none">
-              <AnimatePresence mode="popLayout">
-                {visibleCards.map((cardIndex, positionIndex) => {
-                  const card = floatingCards[cardIndex];
+            {/* Floating Cards - Dynamic based on image */}
+            <div className="absolute inset-0 pointer-events-none z-20">
+              <AnimatePresence mode="wait">
+                {floatingCards.map((card, positionIndex) => {
                   const position = cardPositions[positionIndex];
                   const IconComponent = card.icon;
                   
                   return (
                     <motion.div
-                      key={card.id}
+                      key={`${currentImageType}-${currentDataIndex}-${card.id}`}
                       initial={{ opacity: 0, scale: 0.8, y: 20 }}
                       animate={{ opacity: 1, scale: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.8, y: -20 }}
@@ -306,7 +481,7 @@ export default function Hero() {
                         left: position.left,
                         right: position.right,
                       }}
-                      className="bg-white rounded-2xl p-3 md:p-4 shadow-xl border border-neutral-100 backdrop-blur-sm max-w-[180px] md:max-w-[200px] min-w-0 z-10 pointer-events-auto"
+                      className={`bg-white rounded-2xl p-3 md:p-4 shadow-xl border border-neutral-100 backdrop-blur-sm max-w-[180px] md:max-w-[200px] min-w-0 z-10 pointer-events-auto`}
                     >
                     <div className="flex items-center gap-2 md:gap-3 min-w-0">
                       {card.avatars ? (

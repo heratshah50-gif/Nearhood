@@ -23,8 +23,8 @@ const trustPoints = [
   },
   {
     icon: BadgeCheck,
-    title: "RERA Verified Properties",
-    description: "Every listed property is verified and registered under RERA compliance.",
+    title: "Quality Verified Items",
+    description: "Every listed bulk buy item is verified and quality-checked for your assurance.",
   },
   {
     icon: Award,
@@ -230,8 +230,8 @@ export default function Trust() {
           >
             <CheckCircle2 className="w-5 h-5 text-green-600" />
             <p className="text-sm text-green-700">
-              <span className="font-semibold">RERA Compliant Platform</span> - All properties 
-              listed are verified and registered under Real Estate Regulatory Authority
+              <span className="font-semibold">Quality Assured Platform</span> - All bulk buy items 
+              listed are verified and quality-checked for your peace of mind
             </p>
           </motion.div>
         </motion.div>

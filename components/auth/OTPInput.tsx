@@ -11,11 +11,24 @@ interface OTPInputProps {
 export default function OTPInput({ length = 6, onComplete, disabled = false }: OTPInputProps) {
   const [otp, setOtp] = useState<string[]>(new Array(length).fill(""));
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const completedRef = useRef<boolean>(false);
+  const onCompleteRef = useRef(onComplete);
+
+  // Update ref when onComplete changes
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   useEffect(() => {
     // Focus first input on mount
     inputRefs.current[0]?.focus();
-  }, []);
+    // Reset completed flag when disabled changes
+    if (disabled) {
+      completedRef.current = false;
+      // Reset OTP when disabled (after failed verification)
+      setOtp(new Array(length).fill(""));
+    }
+  }, [disabled, length]);
 
   const handleChange = (index: number, value: string) => {
     if (disabled) return;
@@ -40,9 +53,13 @@ export default function OTPInput({ length = 6, onComplete, disabled = false }: O
       const nextIndex = Math.min(index + digits.length, length - 1);
       inputRefs.current[nextIndex]?.focus();
       
-      // Check if complete
-      if (newOtp.every((d) => d !== "")) {
-        onComplete(newOtp.join(""));
+      // Check if complete - use setTimeout to ensure state is updated
+      if (newOtp.every((d) => d !== "") && !completedRef.current) {
+        completedRef.current = true;
+        // Use setTimeout to ensure state is fully updated before calling onComplete
+        setTimeout(() => {
+          onCompleteRef.current(newOtp.join(""));
+        }, 50);
       }
     } else {
       const newOtp = [...otp];
@@ -54,9 +71,13 @@ export default function OTPInput({ length = 6, onComplete, disabled = false }: O
         inputRefs.current[index + 1]?.focus();
       }
 
-      // Check if complete
-      if (numericValue && newOtp.every((d) => d !== "")) {
-        onComplete(newOtp.join(""));
+      // Check if complete - use setTimeout to ensure state is updated
+      if (numericValue && newOtp.every((d) => d !== "") && !completedRef.current) {
+        completedRef.current = true;
+        // Use setTimeout to ensure state is fully updated before calling onComplete
+        setTimeout(() => {
+          onCompleteRef.current(newOtp.join(""));
+        }, 50);
       }
     }
   };
@@ -104,9 +125,13 @@ export default function OTPInput({ length = 6, onComplete, disabled = false }: O
       const lastFilledIndex = Math.min(digits.length - 1, length - 1);
       inputRefs.current[lastFilledIndex]?.focus();
       
-      // Check if complete
-      if (newOtp.every((d) => d !== "")) {
-        onComplete(newOtp.join(""));
+      // Check if complete - use setTimeout to ensure state is updated
+      if (newOtp.every((d) => d !== "") && !completedRef.current) {
+        completedRef.current = true;
+        // Use setTimeout to ensure state is fully updated before calling onComplete
+        setTimeout(() => {
+          onCompleteRef.current(newOtp.join(""));
+        }, 50);
       }
     }
   };

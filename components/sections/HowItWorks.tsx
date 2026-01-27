@@ -17,10 +17,10 @@ const steps = [
     number: "01",
     title: "Browse & Discover",
     description:
-      "Explore our curated selection of premium properties with active group buying opportunities in Ahmedabad.",
+      "Explore our curated selection of premium bulk buy items with active group buying opportunities in Ahmedabad.",
     icon: Search,
     color: "from-primary-400 to-primary-500",
-    benefits: ["Verified listings", "Transparent pricing", "RERA registered"],
+    benefits: ["Verified listings", "Transparent pricing", "Quality assured"],
   },
   {
     number: "02",
@@ -35,10 +35,10 @@ const steps = [
     number: "03",
     title: "We Negotiate",
     description:
-      "Our expert team leverages the collective buying power of the group to negotiate the best possible deal with developers.",
+      "Our expert team leverages the collective buying power of the group to negotiate the best possible deal with suppliers.",
     icon: Handshake,
     color: "from-primary-500 to-primary-600",
-    benefits: ["Bulk discounts", "Extra amenities", "Better payment plans"],
+    benefits: ["Bulk discounts", "Extra benefits", "Better payment plans"],
   },
   {
     number: "04",
@@ -172,7 +172,7 @@ export default function HowItWorks() {
             className="text-3xl lg:text-5xl font-bold text-neutral-800 mb-4"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            Your Path to Smart Property Buying
+            Your Path to Smart Bulk Buying
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 20 }}

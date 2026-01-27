@@ -61,7 +61,7 @@ export default function ContactUs() {
       <Header onLoginClick={() => setIsLoginModalOpen(true)} />
 
       <main className="flex-1">
-        <div className="container-custom pt-20 md:pt-24 lg:pt-28 pb-16">
+        <div className="container-custom pt-28 md:pt-32 lg:pt-36 pb-16">
           {/* Hero Section */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}

@@ -22,14 +22,14 @@ export default function WhyInvest() {
               className="text-2xl lg:text-3xl font-bold text-neutral-800 mb-6"
               style={{ fontFamily: "var(--font-display)" }}
             >
-              Why Invest in Property with Nearhood
+              Why Invest in Bulk Buy Items with Nearhood
             </h2>
             <p className="text-neutral-600 mb-4 leading-relaxed">
-              Investing in property with <strong>group buying</strong> provides an excellent return on investment. 
-              Buying through Nearhood today can bring you great benefits—save up to 20% and move into your dream home sooner.
+              Investing in bulk buy items with <strong>group buying</strong> provides an excellent return on investment. 
+              Buying through Nearhood today can bring you great benefits—save up to 20% and get your items sooner.
             </p>
             <p className="text-neutral-600 mb-4 leading-relaxed">
-              Nearhood is built on integrity in real estate, offering premium properties in Ahmedabad. 
+              Nearhood is built on integrity in bulk buying, offering premium items in Ahmedabad. 
               Our platform is designed to redefine how you buy—transparent, secure, and focused on your savings.
             </p>
             {expanded && (
@@ -39,16 +39,16 @@ export default function WhyInvest() {
                 className="space-y-4"
               >
                 <p className="text-neutral-600 leading-relaxed">
-                  <strong>Design and value—</strong> Our properties blend thoughtful design with luxurious living at 
-                  affordable group prices. Choose from different configurations to match your needs.
+                  <strong>Quality and value—</strong> Our bulk buy items blend thoughtful selection with quality at 
+                  affordable group prices. Choose from different categories to match your needs.
                 </p>
                 <p className="text-neutral-600 leading-relaxed">
-                  <strong>Connectivity and quality—</strong> We focus on well-connected projects with green spaces, 
-                  strong infrastructure, and RERA-verified builders. Our platform connects you with trusted developers.
+                  <strong>Trust and quality—</strong> We focus on verified items with quality assurance, 
+                  strong supplier relationships, and trusted vendors. Our platform connects you with reliable suppliers.
                 </p>
                 <p className="text-neutral-600 leading-relaxed">
-                  <strong>Essential amenities—</strong> Properties on Nearhood offer modern amenities, 24/7 security, 
-                  and quality construction. Every listing is verified for your peace of mind.
+                  <strong>Quality assurance—</strong> Bulk buy items on Nearhood offer quality checks, verified suppliers, 
+                  and reliable delivery. Every listing is verified for your peace of mind.
                 </p>
               </motion.div>
             )}
@@ -67,10 +67,10 @@ export default function WhyInvest() {
             className="grid grid-cols-2 gap-4"
           >
             {[
-              { icon: Building2, title: "Premium Projects", desc: "Handpicked RERA-verified properties" },
+              { icon: Building2, title: "Premium Items", desc: "Handpicked verified bulk buy items" },
               { icon: Shield, title: "Secure & Transparent", desc: "Escrow and clear documentation" },
               { icon: TrendingUp, title: "Save Up to 20%", desc: "Group discounts on every deal" },
-              { icon: Leaf, title: "Quality Living", desc: "Modern amenities and green spaces" },
+              { icon: Leaf, title: "Quality Assured", desc: "Verified suppliers and quality checks" },
             ].map((item, i) => {
               const Icon = item.icon;
               return (

@@ -35,13 +35,33 @@ function formatPrice(price: number): string {
   return `₹${(price / 100000).toFixed(0)} L`;
 }
 
-function PropertyCard({ property }: { property: Property }) {
+function PropertyCard({ property, onLoginClick, userInfo }: { property: Property; onLoginClick: () => void; userInfo: any }) {
   const [isLiked, setIsLiked] = useState(false);
   const slug = getPropertySlug(property.name);
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (!userInfo) {
+      e.preventDefault();
+      e.stopPropagation();
+      onLoginClick();
+    }
+  };
+
+  const handleJoinGroup = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!userInfo) {
+      onLoginClick();
+    } else {
+      // User is logged in, proceed with joining group
+      window.location.href = `/properties/${slug}`;
+    }
+  };
+
   return (
     <a
-      href={`/properties/${slug}`}
+      href={userInfo ? `/properties/${slug}` : "#"}
+      onClick={handleCardClick}
       data-property-card="true"
       className="block bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-neutral-100 w-full"
     >
@@ -139,7 +159,10 @@ function PropertyCard({ property }: { property: Property }) {
           </div>
         </div>
 
-        <button className="w-full py-2.5 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors">
+        <button 
+          onClick={handleJoinGroup}
+          className="w-full py-2.5 bg-red-500 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors"
+        >
           Join Group
         </button>
       </div>
@@ -161,6 +184,7 @@ export default function PropertiesPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [userInfo, setUserInfo] = useState<any>(null);
   const [viewMode, setViewMode] = useState<"list" | "map">("list");
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState("");
@@ -174,6 +198,45 @@ export default function PropertiesPage() {
   const [budgetMaxCr, setBudgetMaxCr] = useState<number | null>(null);
   const [propertyType, setPropertyType] = useState("");
   const propertiesGridRef = useRef<HTMLDivElement>(null);
+
+  // Check if user is logged in
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const userStr = window.sessionStorage.getItem("nearhood_user");
+      if (userStr) {
+        try {
+          setUserInfo(JSON.parse(userStr));
+        } catch (e) {
+          setUserInfo(null);
+        }
+      } else {
+        setUserInfo(null);
+        // Show login modal if not logged in
+        setIsLoginModalOpen(true);
+      }
+    }
+  }, []);
+
+  // Listen for login events
+  useEffect(() => {
+    const checkUserLogin = () => {
+      if (typeof window !== "undefined") {
+        const userStr = window.sessionStorage.getItem("nearhood_user");
+        if (userStr) {
+          try {
+            setUserInfo(JSON.parse(userStr));
+            setIsLoginModalOpen(false);
+          } catch (e) {
+            setUserInfo(null);
+          }
+        } else {
+          setUserInfo(null);
+        }
+      }
+    };
+    window.addEventListener("userLoggedIn", checkUserLogin);
+    return () => window.removeEventListener("userLoggedIn", checkUserLogin);
+  }, []);
 
   // Read all filters from URL on mount
   useEffect(() => {
@@ -435,7 +498,7 @@ export default function PropertiesPage() {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 w-full">
                   {filteredProperties.map((property) => (
-                    <PropertyCard key={property.id} property={property} />
+                    <PropertyCard key={property.id} property={property} onLoginClick={() => setIsLoginModalOpen(true)} userInfo={userInfo} />
                   ))}
                 </div>
               </div>
@@ -445,7 +508,7 @@ export default function PropertiesPage() {
               {/* Properties List */}
               <div className="w-1/2 overflow-y-auto space-y-4 pr-4">
                 {filteredProperties.map((property) => (
-                  <PropertyCard key={property.id} property={property} />
+                  <PropertyCard key={property.id} property={property} onLoginClick={() => setIsLoginModalOpen(true)} userInfo={userInfo} />
                 ))}
               </div>
               
