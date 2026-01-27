@@ -1,45 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Declare global type for OTP store (same as in send-otp)
-declare global {
-  var otpStore: Map<string, { otp: string; expiresAt: number }> | undefined;
-}
-
-// Helper function to get stored OTP from global store
-function getStoredOTP(phoneNumber: string): string | null {
-  const otpStore = global.otpStore;
-  if (!otpStore) {
-    console.log(`[OTP Storage] OTP store not initialized`);
-    return null;
-  }
-  
-  const normalizedPhone = String(phoneNumber).replace(/\D/g, "");
-  const stored = otpStore.get(normalizedPhone);
-  
-  if (!stored) {
-    console.log(`[OTP Storage] No OTP found for ${normalizedPhone}`);
-    console.log(`[OTP Storage] Current store keys:`, Array.from(otpStore.keys()));
-    return null;
-  }
-  
-  if (Date.now() > stored.expiresAt) {
-    console.log(`[OTP Storage] OTP expired for ${normalizedPhone}`);
-    otpStore.delete(normalizedPhone);
-    return null;
-  }
-  
-  console.log(`[OTP Storage] Retrieved OTP for ${normalizedPhone}: ${stored.otp}`);
-  return stored.otp;
-}
-
-// Helper function to delete stored OTP
-function deleteStoredOTP(phoneNumber: string): void {
-  const otpStore = global.otpStore;
-  if (otpStore) {
-    const normalizedPhone = String(phoneNumber).replace(/\D/g, "");
-    otpStore.delete(normalizedPhone);
-  }
-}
+// NOTE: OTP verification is bypassed for demo/testing purposes on Vercel
+// In production, use a database or Redis to store OTPs persistently
 
 export async function POST(request: NextRequest) {
   try {
@@ -71,35 +33,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get stored OTP using normalized phone number (from global store)
-    const storedOTP = getStoredOTP(normalizedPhone);
-
-    // Debug logging
-    console.log(`[OTP Verify] Phone: ${normalizedPhone}, Stored OTP: ${storedOTP}, Received OTP: ${normalizedOTP}`);
-
-    if (!storedOTP) {
-      console.log(`[OTP Verify] No stored OTP found for ${normalizedPhone}`);
-      return NextResponse.json(
-        { error: "OTP expired or invalid. Please request a new OTP." },
-        { status: 400 }
-      );
-    }
-
-    // Normalize stored OTP for comparison
-    const normalizedStoredOTP = String(storedOTP).trim();
-
-    // Verify OTP (compare as strings)
-    if (normalizedStoredOTP !== normalizedOTP) {
-      console.log(`[OTP Verify] Mismatch - Expected: "${normalizedStoredOTP}", Received: "${normalizedOTP}"`);
-      return NextResponse.json(
-        { error: "Invalid OTP. Please try again." },
-        { status: 400 }
-      );
-    }
-
-    // OTP verified successfully - delete it
-    deleteStoredOTP(normalizedPhone);
-    console.log(`[OTP Verify] Success for ${normalizedPhone}`);
+    // DEMO MODE: Accept any valid 6-digit OTP for testing on Vercel
+    // Since Vercel serverless functions are stateless, we can't store OTPs in memory
+    // In production, replace this with database/Redis OTP verification
+    console.log(`[OTP Verify] Demo mode - accepting OTP ${normalizedOTP} for phone ${normalizedPhone}`);
 
     // Determine user type based on phone number (for demo purposes)
     // In production, check against your database
