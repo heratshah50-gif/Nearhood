@@ -24,9 +24,19 @@ function formatPrice(price: number): string {
   return `₹${(price / 1000).toFixed(0)}K`;
 }
 
-function VehicleCard({ vehicle }: { vehicle: VehicleProduct }) {
+function VehicleCard({ vehicle, onLoginClick, userInfo }: { vehicle: VehicleProduct; onLoginClick: () => void; userInfo: any }) {
   const [isLiked, setIsLiked] = useState(false);
   const slug = getProductSlug(vehicle.name);
+
+  const handleJoinGroup = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!userInfo) {
+      onLoginClick();
+    } else {
+      window.location.href = `/vehicles/${vehicle.subcategory}/${slug}`;
+    }
+  };
 
   return (
     <Link href={`/vehicles/${vehicle.subcategory}/${slug}`}>
