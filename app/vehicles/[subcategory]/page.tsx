@@ -210,9 +210,36 @@ function VehicleCard({ vehicle, onLoginClick, userInfo }: { vehicle: VehicleProd
   );
 }
 
+interface UserInfo {
+  phoneNumber: string;
+  name: string;
+}
+
 export default function VehicleListingPage({ params }: VehicleListingPageProps) {
   const router = useRouter();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+
+  useEffect(() => {
+    const checkUserLogin = () => {
+      if (typeof window !== "undefined") {
+        const userStr = window.sessionStorage.getItem("nearhood_user");
+        if (userStr) {
+          try {
+            setUserInfo(JSON.parse(userStr));
+          } catch (e) {
+            setUserInfo(null);
+          }
+        } else {
+          setUserInfo(null);
+        }
+      }
+    };
+
+    checkUserLogin();
+    window.addEventListener("userLoggedIn", checkUserLogin);
+    return () => window.removeEventListener("userLoggedIn", checkUserLogin);
+  }, []);
 
   const subcategory = params.subcategory === "cars" ? "car" : params.subcategory === "bikes" ? "bike" : null;
   const vehicles = useMemo(() => {
