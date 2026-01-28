@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Search, Plus, Upload, X } from "lucide-react";
+import ThemedSelect from "@/components/vendor/ThemedSelect";
 import { getPropertyImage } from "@/lib/property-images";
 
 type PropertyRow = {
@@ -121,26 +122,30 @@ export default function MyPropertiesPage() {
               className="w-full pl-10 pr-4 py-2.5 rounded-full border border-neutral-200 bg-white text-sm text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300 shadow-sm"
             />
           </div>
-          <select
+          <ThemedSelect
             value={type}
-            onChange={(e) => setType(e.target.value)}
-            className="px-4 py-2.5 rounded-full border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
-          >
-            <option value="">Type</option>
-            <option value="Apartments">Apartments</option>
-            <option value="Villas">Villas</option>
-            <option value="Plots">Plots</option>
-          </select>
-          <select
+            onChange={setType}
+            placeholder="Type"
+            options={[
+              { value: "", label: "All Types" },
+              { value: "Apartments", label: "Apartments" },
+              { value: "Villas", label: "Villas" },
+              { value: "Plots", label: "Plots" },
+            ]}
+            className="min-w-[130px]"
+          />
+          <ThemedSelect
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="px-4 py-2.5 rounded-full border border-neutral-200 bg-white text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
-          >
-            <option value="">Status</option>
-            <option value="Active">Active</option>
-            <option value="Sold Out">Sold Out</option>
-            <option value="Upcoming">Upcoming</option>
-          </select>
+            onChange={setStatus}
+            placeholder="Status"
+            options={[
+              { value: "", label: "All Status" },
+              { value: "Active", label: "Active" },
+              { value: "Sold Out", label: "Sold Out" },
+              { value: "Upcoming", label: "Upcoming" },
+            ]}
+            className="min-w-[130px]"
+          />
         </div>
         <button
           onClick={() => {
@@ -212,7 +217,7 @@ export default function MyPropertiesPage() {
 
       {/* Add / Bulk modal */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-md">
           <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-6 md:p-7 relative">
             <button
               onClick={() => setIsAddOpen(false)}
@@ -279,15 +284,22 @@ export default function MyPropertiesPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-1">Property type</label>
-                    <select
-                      value={form.type}
-                      onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
-                      className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
-                    >
-                      <option value="Apartments">Apartments</option>
-                      <option value="Villas">Villas</option>
-                      <option value="Plots">Plots</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        value={form.type}
+                        onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
+                        className="w-full appearance-none px-4 py-2.5 pr-10 rounded-xl border-2 border-neutral-200 text-sm bg-white cursor-pointer focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 hover:border-primary-300 transition-all"
+                      >
+                        <option value="Apartments">Apartments</option>
+                        <option value="Villas">Villas</option>
+                        <option value="Plots">Plots</option>
+                      </select>
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                        <svg className="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -16,14 +16,14 @@ import {
 
 const SIDEBAR_LINKS: { href: string; label: string; icon: React.ElementType }[] = [
   { href: "/vendor", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/vendor/listings", label: "My Listings", icon: Building2 },
+  { href: "/vendor/listings", label: "Listings", icon: Building2 },
   { href: "/vendor/inquiries", label: "Group Inquiries", icon: Users },
   { href: "/vendor/offers", label: "Offers & Deals", icon: Handshake },
 ];
 
 const TITLES: Record<string, string> = {
   "/vendor": "Dashboard",
-  "/vendor/listings": "My Listings",
+  "/vendor/listings": "Listings",
   "/vendor/listings/properties": "Property Listings",
   "/vendor/listings/vehicles": "Vehicle Listings",
   "/vendor/inquiries": "Group Inquiries",
@@ -55,7 +55,7 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-primary-50/50 via-white to-primary-50/30">
       {/* Sidebar - purple gradient */}
-      <aside className="w-60 flex-shrink-0 bg-gradient-to-b from-primary-600 to-primary-700 flex flex-col shadow-xl">
+      <aside className="w-60 flex-shrink-0 bg-gradient-to-b from-primary-600 to-primary-700 flex flex-col shadow-xl z-10">
         <div className="p-4 flex items-center gap-3 border-b border-white/10">
           <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center">
             <Store className="w-5 h-5 text-white" />
@@ -108,7 +108,7 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top header */}
-        <header className="h-16 flex-shrink-0 bg-white/80 backdrop-blur-sm border-b border-neutral-200 flex items-center justify-between px-6 sticky top-0 z-10">
+        <header className="h-16 flex-shrink-0 bg-white/80 backdrop-blur-sm border-b border-neutral-200 flex items-center justify-between px-6 sticky top-0 z-20">
           <h1 className="text-xl font-bold text-neutral-800" style={{ fontFamily: "var(--font-display)" }}>
             {title}
           </h1>

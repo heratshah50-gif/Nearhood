@@ -1,10 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { Building2, Users, MessageSquare, FileText, TrendingUp, Car, LayoutGrid } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Building2, Users, MessageSquare, TrendingUp, Car, LayoutGrid } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { getPropertyImage } from "@/lib/property-images";
+import dynamic from "next/dynamic";
+
+// Dynamically import ApexCharts to avoid SSR issues
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 // Category Data
 const CATEGORY_DATA = {
@@ -13,9 +17,8 @@ const CATEGORY_DATA = {
       { label: "Total Listings", value: "13", icon: LayoutGrid, gradient: "from-primary-500 to-primary-600", text: "text-primary-600" },
       { label: "Active Groups", value: "15", icon: Users, gradient: "from-violet-500 to-violet-600", text: "text-violet-600" },
       { label: "New Inquiries", value: "22", icon: MessageSquare, gradient: "from-emerald-500 to-emerald-600", text: "text-emerald-600" },
-      { label: "Pending Offers", value: "5", icon: FileText, gradient: "from-amber-500 to-amber-600", text: "text-amber-600" },
     ],
-    chartData: { new: [0, 35, 50, 65], negotiation: [0, 25, 40, 50], closed: [0, 15, 20, 30] },
+    chartData: { new: [25, 45, 60, 80], negotiation: [15, 35, 50, 65], closed: [10, 25, 35, 50] },
     growth: "+15%",
   },
   properties: {
@@ -23,9 +26,8 @@ const CATEGORY_DATA = {
       { label: "Total Properties", value: "8", icon: Building2, gradient: "from-primary-500 to-primary-600", text: "text-primary-600" },
       { label: "Active Groups", value: "10", icon: Users, gradient: "from-violet-500 to-violet-600", text: "text-violet-600" },
       { label: "New Inquiries", value: "15", icon: MessageSquare, gradient: "from-emerald-500 to-emerald-600", text: "text-emerald-600" },
-      { label: "Pending Offers", value: "3", icon: FileText, gradient: "from-amber-500 to-amber-600", text: "text-amber-600" },
     ],
-    chartData: { new: [0, 30, 45, 55], negotiation: [0, 20, 35, 40], closed: [0, 10, 15, 20] },
+    chartData: { new: [20, 40, 55, 75], negotiation: [12, 30, 45, 55], closed: [8, 20, 30, 40] },
     growth: "+12%",
   },
   vehicles: {
@@ -33,9 +35,8 @@ const CATEGORY_DATA = {
       { label: "Total Vehicles", value: "5", icon: Car, gradient: "from-violet-500 to-violet-600", text: "text-violet-600" },
       { label: "Active Groups", value: "5", icon: Users, gradient: "from-primary-500 to-primary-600", text: "text-primary-600" },
       { label: "New Inquiries", value: "7", icon: MessageSquare, gradient: "from-emerald-500 to-emerald-600", text: "text-emerald-600" },
-      { label: "Pending Offers", value: "2", icon: FileText, gradient: "from-amber-500 to-amber-600", text: "text-amber-600" },
     ],
-    chartData: { new: [0, 20, 35, 45], negotiation: [0, 15, 25, 35], closed: [0, 5, 10, 15] },
+    chartData: { new: [15, 30, 45, 60], negotiation: [10, 25, 35, 50], closed: [5, 15, 25, 35] },
     growth: "+18%",
   },
 };
@@ -91,32 +92,121 @@ type CategoryType = "all" | "properties" | "vehicles";
 
 function ActivityChart({ category }: { category: CategoryType }) {
   const data = CATEGORY_DATA[category];
-  
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Chart data in ApexCharts format
+  const chartOptions: ApexCharts.ApexOptions = {
+    chart: {
+      type: "bar",
+      toolbar: { show: false },
+      fontFamily: "inherit",
+    },
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: "60%",
+        borderRadius: 4,
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      show: true,
+      width: 2,
+      colors: ["transparent"],
+    },
+    xaxis: {
+      categories: CHART_LABELS,
+      labels: {
+        style: {
+          colors: "#6b7280",
+          fontSize: "12px",
+        },
+      },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: "#9ca3af",
+          fontSize: "12px",
+        },
+        formatter: (value: number) => {
+          if (value >= 1000) return `${value / 1000}k`;
+          return value.toString();
+        },
+      },
+    },
+    fill: {
+      opacity: 1,
+    },
+    legend: {
+      position: "top",
+      horizontalAlign: "right",
+      markers: {
+        size: 8,
+        shape: "circle",
+      },
+      itemMargin: {
+        horizontal: 12,
+      },
+    },
+    colors: ["#10b981", "#3b82f6", "#6ee7b7"],
+    grid: {
+      borderColor: "#f3f4f6",
+      strokeDashArray: 0,
+    },
+    tooltip: {
+      y: {
+        formatter: (value: number) => `${value} items`,
+      },
+    },
+  };
+
+  const chartSeries = [
+    {
+      name: "New Inquiries",
+      data: data.chartData.new.map((v) => v * 80), // Scale to realistic numbers
+    },
+    {
+      name: "In Negotiation",
+      data: data.chartData.negotiation.map((v) => v * 75),
+    },
+    {
+      name: "Closed Deals",
+      data: data.chartData.closed.map((v) => v * 60),
+    },
+  ];
+
   return (
     <div className="bg-white rounded-2xl border border-neutral-200 p-6 shadow-sm">
-      <div className="flex items-center justify-between mb-5">
-        <h3 className="font-semibold text-neutral-800" style={{ fontFamily: "var(--font-display)" }}>Group Activity</h3>
-        <div className="flex items-center gap-1.5 text-xs text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-semibold text-neutral-800 text-lg" style={{ fontFamily: "var(--font-display)" }}>
+          Group Activity
+        </h3>
+        <div className="flex items-center gap-1.5 text-xs text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-full">
           <TrendingUp className="w-3.5 h-3.5" />
           {data.growth} this week
-        </div>
-      </div>
-      <div className="h-36 flex items-end gap-3">
-        {CHART_LABELS.map((l, i) => (
-          <div key={l} className="flex-1 flex flex-col items-center gap-1.5">
-            <div className="w-full flex-1 flex items-end gap-1">
-              <div className="flex-1 bg-gradient-to-t from-primary-500 to-primary-400 rounded-t-md" style={{ height: `${data.chartData.new[i]}%` }} />
-              <div className="flex-1 bg-gradient-to-t from-violet-500 to-violet-400 rounded-t-md" style={{ height: `${data.chartData.negotiation[i]}%` }} />
-              <div className="flex-1 bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-md" style={{ height: `${data.chartData.closed[i]}%` }} />
-            </div>
-            <span className="text-[11px] text-neutral-500 font-medium">{l}</span>
           </div>
-        ))}
       </div>
-      <div className="flex gap-5 mt-4 pt-4 border-t border-neutral-100">
-        <span className="flex items-center gap-2 text-xs font-medium text-neutral-600"><span className="w-3 h-3 rounded-sm bg-gradient-to-r from-primary-500 to-primary-400" />New Inquiries</span>
-        <span className="flex items-center gap-2 text-xs font-medium text-neutral-600"><span className="w-3 h-3 rounded-sm bg-gradient-to-r from-violet-500 to-violet-400" />In Negotiation</span>
-        <span className="flex items-center gap-2 text-xs font-medium text-neutral-600"><span className="w-3 h-3 rounded-sm bg-gradient-to-r from-emerald-500 to-emerald-400" />Closed Deals</span>
+
+      {/* Chart */}
+      <div className="h-72">
+        {mounted && (
+          <Chart
+            options={chartOptions}
+            series={chartSeries}
+            type="bar"
+            height="100%"
+          />
+        )}
       </div>
     </div>
   );
@@ -169,7 +259,7 @@ export default function VendorDashboardPage() {
       </div>
 
       {/* Metric cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {currentMetrics.map(({ label, value, icon: Icon, gradient, text }) => (
           <div key={label} className="bg-white rounded-2xl border border-neutral-200 p-5 flex items-center gap-4 shadow-sm hover:shadow-md transition-shadow">
             <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white shadow-lg`}>

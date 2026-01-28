@@ -52,7 +52,7 @@ export default function MyListingsPage() {
       {/* Header */}
       <div>
         <h2 className="text-2xl font-bold text-neutral-800" style={{ fontFamily: "var(--font-display)" }}>
-          My Listings
+          Listings
         </h2>
         <p className="text-neutral-600 mt-1">Select a category to view and manage your listings</p>
       </div>
