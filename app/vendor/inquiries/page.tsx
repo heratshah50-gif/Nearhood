@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Plus, Users } from "lucide-react";
 
 const ROWS = [
   { id: 1, name: "Skyline Heights Buyers", property: "Skyline Heights", buyers: "28", date: "Apr 12, 2024", status: "Active" },
@@ -13,9 +13,9 @@ const ROWS = [
 ];
 
 const STATUS_STYLES: Record<string, string> = {
-  Active: "bg-green-100 text-green-700",
-  "In Negotiation": "bg-orange-100 text-orange-700",
-  Upcoming: "bg-sky-100 text-sky-700",
+  Active: "bg-emerald-100 text-emerald-700",
+  "In Negotiation": "bg-violet-100 text-violet-700",
+  Upcoming: "bg-primary-100 text-primary-700",
   Closed: "bg-neutral-100 text-neutral-600",
 };
 
@@ -25,24 +25,24 @@ export default function GroupInquiriesPage() {
   const [status, setStatus] = useState("");
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {/* Filter bar */}
       <div className="flex flex-wrap items-center gap-3 justify-between">
         <div className="flex flex-wrap items-center gap-3 flex-1">
-          <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400" />
+          <div className="relative flex-1 min-w-[220px]">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by property"
-              className="w-full pl-10 pr-4 py-2.5 border border-neutral-300 rounded-lg text-sm focus:ring-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] outline-none"
+              className="w-full pl-10 pr-4 py-2.5 border-2 border-neutral-200 rounded-xl text-sm focus:ring-4 focus:ring-primary-100 focus:border-primary-400 outline-none transition-all"
             />
           </div>
           <select
             value={property}
             onChange={(e) => setProperty(e.target.value)}
-            className="px-4 py-2.5 border border-neutral-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+            className="px-4 py-2.5 border-2 border-neutral-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-400"
           >
             <option value="">My Property</option>
             <option>Skyline Heights</option>
@@ -52,7 +52,7 @@ export default function GroupInquiriesPage() {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="px-4 py-2.5 border border-neutral-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#3b82f6]"
+            className="px-4 py-2.5 border-2 border-neutral-200 rounded-xl text-sm bg-white focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-400"
           >
             <option value="">Status</option>
             <option>Active</option>
@@ -61,48 +61,56 @@ export default function GroupInquiriesPage() {
             <option>Closed</option>
           </select>
         </div>
-        <button className="px-5 py-2.5 bg-[#1e3a5f] hover:bg-[#2d4a6f] text-white font-semibold rounded-lg transition-colors">
-          + Add Property
+        <button className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-primary-500/25">
+          <Plus className="w-4 h-4" />
+          Add Property
         </button>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-neutral-200 overflow-hidden">
+      <div className="bg-white rounded-2xl border border-neutral-200 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-neutral-200 bg-neutral-50">
-                <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-700">Group Name</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-700">Property</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-700">Interested Buyers</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-700">Registry Date</th>
-                <th className="text-left py-3 px-4 text-sm font-semibold text-neutral-700">Status</th>
-                <th className="text-right py-3 px-4 text-sm font-semibold text-neutral-700">Actions</th>
+              <tr className="border-b border-neutral-200 bg-neutral-50/80">
+                <th className="text-left py-3.5 px-4 text-xs font-semibold text-neutral-500 uppercase tracking-wide">Group Name</th>
+                <th className="text-left py-3.5 px-4 text-xs font-semibold text-neutral-500 uppercase tracking-wide">Property</th>
+                <th className="text-left py-3.5 px-4 text-xs font-semibold text-neutral-500 uppercase tracking-wide">Interested Buyers</th>
+                <th className="text-left py-3.5 px-4 text-xs font-semibold text-neutral-500 uppercase tracking-wide">Registry Date</th>
+                <th className="text-left py-3.5 px-4 text-xs font-semibold text-neutral-500 uppercase tracking-wide">Status</th>
+                <th className="text-right py-3.5 px-4 text-xs font-semibold text-neutral-500 uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
             <tbody>
               {ROWS.map((r) => (
-                <tr key={r.id} className="border-b border-neutral-100 hover:bg-neutral-50/50">
-                  <td className="py-3 px-4 font-medium text-neutral-800">{r.name}</td>
-                  <td className="py-3 px-4 text-sm text-neutral-600">{r.property}</td>
-                  <td className="py-3 px-4 text-sm text-neutral-600">{r.buyers}</td>
-                  <td className="py-3 px-4 text-sm text-neutral-600">{r.date}</td>
-                  <td className="py-3 px-4">
-                    <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${STATUS_STYLES[r.status] || "bg-neutral-100 text-neutral-600"}`}>
+                <tr key={r.id} className="border-b border-neutral-100 hover:bg-primary-50/30 transition-colors">
+                  <td className="py-3.5 px-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-9 h-9 rounded-lg bg-primary-100 flex items-center justify-center">
+                        <Users className="w-4 h-4 text-primary-600" />
+                      </div>
+                      <span className="font-medium text-neutral-800">{r.name}</span>
+                    </div>
+                  </td>
+                  <td className="py-3.5 px-4 text-sm text-neutral-600">{r.property}</td>
+                  <td className="py-3.5 px-4 text-sm font-semibold text-primary-600">{r.buyers}</td>
+                  <td className="py-3.5 px-4 text-sm text-neutral-600">{r.date}</td>
+                  <td className="py-3.5 px-4">
+                    <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[r.status] || "bg-neutral-100 text-neutral-600"}`}>
                       {r.status}
                     </span>
                   </td>
-                  <td className="py-3 px-4 text-right">
-                    <button className="text-sm text-[#1e3a5f] hover:underline font-medium">View</button>
+                  <td className="py-3.5 px-4 text-right">
+                    <button className="text-sm text-primary-600 hover:text-primary-700 font-semibold">View →</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <div className="px-4 py-3 border-t border-neutral-200 flex items-center justify-between text-sm text-neutral-600">
+        <div className="px-4 py-3 border-t border-neutral-200 flex items-center justify-between text-sm text-neutral-600 bg-neutral-50/60">
           <span>Showing 6 of 8</span>
-          <button className="px-4 py-1.5 border border-neutral-300 rounded-lg hover:bg-neutral-50">Next &gt;</button>
+          <button className="px-4 py-1.5 rounded-lg border border-neutral-300 hover:bg-white hover:border-primary-300 transition-colors">Next →</button>
         </div>
       </div>
     </div>
