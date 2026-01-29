@@ -75,7 +75,7 @@ function StepCard({
         {/* Step Number Badge */}
         <div className="flex items-center gap-3 mb-4">
           <span
-            className="text-5xl lg:text-6xl font-bold text-primary-100"
+            className="text-5xl lg:text-6xl font-bold text-primary-300"
             style={{ fontFamily: "var(--font-display)" }}
           >
             {step.number}

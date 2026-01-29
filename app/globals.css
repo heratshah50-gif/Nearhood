@@ -487,3 +487,12 @@ input[type="range"].slider-primary::-moz-range-track {
   border-radius: 5px;
   background: transparent;
 }
+
+/* Zoom in/out on hover for property cards (section#properties) */
+.card-zoom-hover {
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.card-zoom-hover:hover {
+  transform: scale(1.05);
+}

@@ -18,16 +18,13 @@ import {
 import { useState } from "react";
 
 const footerLinks = {
-  properties: [
-    { label: "New Launches", href: "#" },
-    { label: "Under Construction", href: "#" },
-    { label: "Ready to Move", href: "#" },
-    { label: "Luxury Homes", href: "#" },
-    { label: "Affordable Housing", href: "#" },
+  categories: [
+    { label: "Properties", href: "/properties" },
+    { label: "Vehicles", href: "/vehicles" },
   ],
   company: [
     { label: "About Us", href: "#about" },
-    { label: "How It Works", href: "#how-it-works" },
+    { label: "How It Works", href: "/how-it-works" },
     { label: "Careers", href: "#" },
     { label: "Press & Media", href: "#" },
     { label: "Partner With Us", href: "#" },
@@ -145,8 +142,8 @@ export default function Footer({ hideSubscribe = false }: FooterProps) {
                 </Link>
                 
                 <p className="text-neutral-600 mb-8 text-[15px] leading-relaxed">
-                  Ahmedabad&apos;s first group buying platform for real estate. Join thousands
-                  of smart buyers to unlock exclusive discounts on premium properties in Ahmedabad.
+                  Ahmedabad&apos;s first group buying platform. Join thousands of smart
+                  buyers to unlock exclusive discounts on premium items in Ahmedabad.
                 </p>
 
                 {/* Contact Info */}
@@ -196,10 +193,10 @@ export default function Footer({ hideSubscribe = false }: FooterProps) {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-6">
                   <div>
                     <h4 className="font-semibold text-neutral-900 mb-5 text-sm uppercase tracking-wider">
-                      Properties
+                      Categories
                     </h4>
                     <ul className="space-y-3">
-                      {footerLinks.properties.map((link) => (
+                      {footerLinks.categories.map((link) => (
                         <li key={link.label}>
                           <Link
                             href={link.href}

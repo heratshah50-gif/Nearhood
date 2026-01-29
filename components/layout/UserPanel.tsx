@@ -86,7 +86,7 @@ export default function UserPanel({ children }: UserPanelProps) {
 
   const navItems = [
     { label: "Home", href: "/", icon: Home },
-    { label: "Properties", href: "/properties", icon: Building2 },
+    { label: "Categories", href: "/properties", icon: Building2 },
     { label: "About Us", href: "/about", icon: Users },
     { label: "Contact Us", href: "/contact", icon: Phone },
   ];
@@ -240,7 +240,7 @@ export default function UserPanel({ children }: UserPanelProps) {
 
       {/* Main Content */}
       <main className="flex-1 ml-56 min-h-screen">
-        <div className="container mx-auto px-4 py-6">
+        <div className="container mx-auto px-4 pt-12 pb-6">
           {children}
         </div>
       </main>

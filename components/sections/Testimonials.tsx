@@ -1,7 +1,16 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useAnimationFrame,
+  useInView,
+  useMotionValue,
+  useReducedMotion,
+  useTransform,
+  wrap,
+} from "framer-motion";
 import {
   Star,
   Quote,
@@ -32,12 +41,15 @@ const testimonials: Testimonial[] = [
   { id: 5, name: "Vikram Singh", avatar: "VS", location: "Thaltej, Ahmedabad", property: "Shivalik Group, Thaltej", savings: "₹38 Lakhs", rating: 5, quote: "The legal documentation support was exceptional. Their team ensured all RERA compliance was met and the paperwork was flawless. Peace of mind is priceless when making such a big investment.", date: "August 2025" },
 ];
 
-function TestimonialCard({ testimonial, isActive }: { testimonial: Testimonial; isActive: boolean }) {
+function TestimonialCard({
+  testimonial,
+  isActive,
+}: {
+  testimonial: Testimonial;
+  isActive?: boolean;
+}) {
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: isActive ? 1 : 0.5, scale: isActive ? 1 : 0.95 }}
-      transition={{ duration: 0.3 }}
+    <div
       className={`bg-white rounded-2xl p-6 lg:p-8 shadow-lg border transition-all duration-300 ${
         isActive ? "border-primary-200 shadow-xl" : "border-neutral-100"
       }`}
@@ -99,6 +111,60 @@ function TestimonialCard({ testimonial, isActive }: { testimonial: Testimonial; 
           </p>
         </div>
       </div>
+    </div>
+  );
+}
+
+function DesktopMarqueeItem({
+  testimonial,
+  index,
+  trackX,
+  containerWidth,
+  itemSpacing,
+  cardWidth,
+}: {
+  testimonial: Testimonial;
+  index: number;
+  trackX: ReturnType<typeof useMotionValue<number>>;
+  containerWidth: number;
+  itemSpacing: number;
+  cardWidth: number;
+}) {
+  const scale = useTransform(trackX, (latest) => {
+    const center = containerWidth / 2;
+    const itemCenter = index * itemSpacing + latest + cardWidth / 2;
+    const dist = Math.abs(itemCenter - center);
+    const maxDist = Math.max(1, center);
+    const normalized = Math.min(1, dist / maxDist);
+    // 1.18 at center, down to 0.90 at edges (very visible)
+    return 1.18 - normalized * 0.28;
+  });
+
+  const opacity = useTransform(trackX, (latest) => {
+    const center = containerWidth / 2;
+    const itemCenter = index * itemSpacing + latest + cardWidth / 2;
+    const dist = Math.abs(itemCenter - center);
+    const maxDist = Math.max(1, center);
+    const normalized = Math.min(1, dist / maxDist);
+    return 1 - normalized * 0.6;
+  });
+
+  const blur = useTransform(trackX, (latest) => {
+    const center = containerWidth / 2;
+    const itemCenter = index * itemSpacing + latest + cardWidth / 2;
+    const dist = Math.abs(itemCenter - center);
+    const maxDist = Math.max(1, center);
+    const normalized = Math.min(1, dist / maxDist);
+    const px = normalized * 3;
+    return `blur(${px.toFixed(2)}px)`;
+  });
+
+  return (
+    <motion.div
+      className="w-[400px] flex-shrink-0 origin-center"
+      style={{ scale, opacity, filter: blur }}
+    >
+      <TestimonialCard testimonial={testimonial} />
     </motion.div>
   );
 }
@@ -107,6 +173,46 @@ export default function Testimonials() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.1 });
+  const prefersReducedMotion = useReducedMotion();
+
+  // --- Desktop continuous carousel config ---
+  const CARD_WIDTH = 400; // px (matches layout)
+  const GAP = 32; // px (gap-8)
+  const ITEM_SPACING = CARD_WIDTH + GAP; // px
+  const BASE_COUNT = testimonials.length;
+
+  const trackItems = useMemo(() => [...testimonials, ...testimonials], []);
+  const trackWidth = BASE_COUNT * ITEM_SPACING; // one full cycle width
+
+  const trackX = useMotionValue(0); // negative => moves left (right-to-left)
+  const [containerWidth, setContainerWidth] = useState(1200);
+  const desktopViewportRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const el = desktopViewportRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect?.width;
+      if (typeof w === "number" && w > 0) setContainerWidth(w);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Center the first card on initial render (so the zoom is obvious immediately)
+  useEffect(() => {
+    const centered = wrap(-trackWidth, 0, containerWidth / 2 - CARD_WIDTH / 2);
+    trackX.set(centered);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [containerWidth]);
+
+  useAnimationFrame((_, delta) => {
+    if (prefersReducedMotion) return;
+    // Speed in px/sec; tune for desired constant motion
+    const speed = 45;
+    const next = trackX.get() - (speed * delta) / 1000;
+    trackX.set(wrap(-trackWidth, 0, next));
+  });
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % testimonials.length);
@@ -164,39 +270,27 @@ export default function Testimonials() {
         <div className="relative">
           {/* Desktop Carousel */}
           <div className="hidden lg:block">
-            <div className="relative h-[500px]">
-              <AnimatePresence mode="popLayout">
-                {getVisibleTestimonials().map((testimonial) => (
-                  <motion.div
-                    key={`${testimonial.id}-${testimonial.position}`}
-                    initial={{ 
-                      opacity: 0, 
-                      x: testimonial.position * 100,
-                      scale: 0.8 
-                    }}
-                    animate={{ 
-                      opacity: testimonial.position === 0 ? 1 : 0.5, 
-                      x: testimonial.position * 420,
-                      scale: testimonial.position === 0 ? 1 : 0.9,
-                      zIndex: testimonial.position === 0 ? 10 : 0
-                    }}
-                    exit={{ 
-                      opacity: 0,
-                      scale: 0.8 
-                    }}
-                    transition={{ duration: 0.4 }}
-                    className="absolute left-1/2 top-0 w-[400px] -ml-[200px]"
-                    style={{
-                      filter: testimonial.position !== 0 ? "blur(1px)" : "none",
-                    }}
-                  >
-                    <TestimonialCard
-                      testimonial={testimonial}
-                      isActive={testimonial.position === 0}
-                    />
-                  </motion.div>
+            <div ref={desktopViewportRef} className="relative h-[520px] overflow-hidden">
+              {/* soft edge fade */}
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-neutral-50 to-transparent z-20" />
+              <div className="pointer-events-none absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-neutral-50 to-transparent z-20" />
+
+              <motion.div
+                className="absolute left-0 top-0 flex items-start gap-8 will-change-transform"
+                style={{ x: trackX }}
+              >
+                {trackItems.map((t, i) => (
+                  <DesktopMarqueeItem
+                    key={`${t.id}-${i}`}
+                    testimonial={t}
+                    index={i}
+                    trackX={trackX}
+                    containerWidth={containerWidth}
+                    itemSpacing={ITEM_SPACING}
+                    cardWidth={CARD_WIDTH}
+                  />
                 ))}
-              </AnimatePresence>
+              </motion.div>
             </div>
           </div>
 
@@ -212,14 +306,14 @@ export default function Testimonials() {
               >
                 <TestimonialCard
                   testimonial={testimonials[currentIndex]}
-                  isActive={true}
+                  isActive
                 />
               </motion.div>
             </AnimatePresence>
           </div>
 
           {/* Navigation */}
-          <div className="flex items-center justify-center gap-4 mt-8 lg:mt-0 lg:absolute lg:bottom-0 lg:left-1/2 lg:-translate-x-1/2">
+          <div className="flex items-center justify-center gap-4 mt-8 lg:mt-6">
             <button
               onClick={prevSlide}
               className="w-12 h-12 rounded-full bg-white shadow-lg border border-neutral-100 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:border-primary-200 transition-all"

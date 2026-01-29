@@ -41,7 +41,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: "Home", href: "/", icon: Home },
   { label: "Categories", href: "#categories", icon: Building2 },
-  { label: "How It Works", href: "#how-it-works", icon: HelpCircle },
+  { label: "How It Works", href: "/how-it-works", icon: HelpCircle },
   { label: "About", href: "/about", icon: Users },
   { label: "Contact", href: "/contact", icon: Phone },
 ];
@@ -587,7 +587,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                                 className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
                               >
                                 <Grid className="w-4 h-4" />
-                                <span>Categories</span>
+                                <span>Properties</span>
                               </Link>
                               <Link
                                 href="/about"

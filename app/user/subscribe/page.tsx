@@ -74,7 +74,7 @@ export default function SubscribePage() {
       <div className="pt-24">
         <UserPanel>
           <div className="max-w-7xl mx-auto">
-            <div className="mb-8">
+            <div className="mb-8 mt-8">
               <h1 className="text-3xl font-bold text-neutral-900 mb-2">
                 Subscribe
               </h1>

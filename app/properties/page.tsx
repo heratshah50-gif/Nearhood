@@ -189,6 +189,7 @@ export default function PropertiesPage() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [possessionStatus, setPossessionStatus] = useState("");
   const [configurationType, setConfigurationType] = useState("");
   const [budget, setBudget] = useState("");
@@ -198,6 +199,19 @@ export default function PropertiesPage() {
   const [budgetMaxCr, setBudgetMaxCr] = useState<number | null>(null);
   const [propertyType, setPropertyType] = useState("");
   const propertiesGridRef = useRef<HTMLDivElement>(null);
+
+  // When category changes: reset filters; if Vehicle selected, go to vehicles page
+  const handleCategoryChange = (value: string) => {
+    setSelectedCategory(value);
+    if (value === "vehicle") {
+      router.push("/vehicles");
+      return;
+    }
+    setConfigurationType("");
+    setPossessionStatus("");
+    setBudget("");
+    setAreaSqft("");
+  };
 
   // Check if user is logged in
   useEffect(() => {
@@ -268,6 +282,9 @@ export default function PropertiesPage() {
 
   const filteredProperties = useMemo(() => {
     return allProperties.filter((prop) => {
+      // Category: on properties page we only show properties; "vehicle" redirects to /vehicles
+      if (selectedCategory && selectedCategory !== "property") return false;
+
       // Search query filter
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
@@ -352,7 +369,7 @@ export default function PropertiesPage() {
       }
       return true;
     });
-  }, [searchQuery, selectedLocation, propertyType, selectedSubRegions, selectedConfigs, budgetMaxCr, possessionStatus, configurationType, budget, areaSqft]);
+  }, [selectedCategory, searchQuery, selectedLocation, propertyType, selectedSubRegions, selectedConfigs, budgetMaxCr, possessionStatus, configurationType, budget, areaSqft]);
 
   // (Footer now sits naturally after content; dynamic top calculation removed)
 
@@ -401,7 +418,23 @@ export default function PropertiesPage() {
                   </div>
                   
                   <div className="space-y-5">
-                    {/* Possession Status */}
+                    {/* Categories - Properties or Vehicle */}
+                    <div>
+                      <label className="block text-sm font-semibold text-neutral-700 mb-2">
+                        Categories
+                      </label>
+                      <select
+                        value={selectedCategory}
+                        onChange={(e) => handleCategoryChange(e.target.value)}
+                        className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      >
+                        <option value="">All</option>
+                        <option value="property">Properties</option>
+                        <option value="vehicle">Vehicle</option>
+                      </select>
+                    </div>
+
+                    {/* Possession Status - options same for all categories */}
                     <div>
                       <label className="block text-sm font-semibold text-neutral-700 mb-2">
                         Possession Status
@@ -474,6 +507,7 @@ export default function PropertiesPage() {
                     {/* Clear Filters Button */}
                     <button
                       onClick={() => {
+                        setSelectedCategory("");
                         setSelectedLocation("");
                         setPossessionStatus("");
                         setConfigurationType("");

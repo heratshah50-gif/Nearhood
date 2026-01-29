@@ -87,7 +87,7 @@ function PropertyCard({ property, index }: { property: Property; index: number }
         initial={{ opacity: 0, y: 30 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.5, delay: index * 0.1 }}
-        className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-neutral-100 w-full h-full flex flex-col cursor-pointer"
+        className="group card-zoom-hover relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-neutral-100 w-full h-full flex flex-col cursor-pointer"
       >
       {/* Image Section */}
       <div className="relative h-52 w-full bg-gradient-to-br from-primary-100 to-primary-200 overflow-hidden">
@@ -320,7 +320,7 @@ function VehicleCard({ vehicle, index }: { vehicle: VehicleProduct; index: numbe
         initial={{ opacity: 0, y: 30 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.5, delay: index * 0.1 }}
-        className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-neutral-100 w-full h-full flex flex-col cursor-pointer"
+        className="group card-zoom-hover relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-neutral-100 w-full h-full flex flex-col cursor-pointer"
       >
         {/* Image Section */}
         <div className="relative h-52 w-full bg-gradient-to-br from-primary-100 to-primary-200 overflow-hidden">
