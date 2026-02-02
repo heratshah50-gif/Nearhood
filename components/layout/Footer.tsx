@@ -19,8 +19,9 @@ import { useState } from "react";
 
 const footerLinks = {
   categories: [
-    { label: "Properties", href: "/properties" },
-    { label: "Vehicles", href: "/vehicles" },
+    { label: "Listings", href: "/listings" },
+    { label: "Properties", href: "/listings?category=property" },
+    { label: "Vehicles", href: "/listings?category=vehicle" },
   ],
   company: [
     { label: "About Us", href: "#about" },

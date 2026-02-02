@@ -92,7 +92,15 @@ function formatPrice(price: number): string {
 // Get dynamic floating cards based on image type
 function getFloatingCardsForImage(imageType: "property" | "vehicle", index: number) {
   if (imageType === "property") {
-    const property = ALL_PROPERTIES[index % ALL_PROPERTIES.length];
+    const props = ALL_PROPERTIES;
+    if (!props.length) {
+      return [
+        { id: 1, type: "members", icon: Users, iconBg: "bg-primary-100", iconColor: "text-primary-600", avatars: true, title: "0 Members", subtitle: "Joined this group" },
+        { id: 2, type: "savings", icon: IndianRupee, iconBg: "bg-green-100", iconColor: "text-green-600", title: "₹0", subtitle: "Average Savings", highlight: true },
+        { id: 3, type: "location", icon: MapPin, iconBg: "bg-blue-100", iconColor: "text-blue-600", title: "Ahmedabad", subtitle: "Prime Location" },
+      ];
+    }
+    const property = props[Math.abs(index) % props.length];
     const membersJoined = property.groupSize - property.spotsLeft;
     const savings = property.marketPrice - property.groupPrice;
     
@@ -129,7 +137,14 @@ function getFloatingCardsForImage(imageType: "property" | "vehicle", index: numb
     ];
   } else {
     const vehicles = getProductsByCategory("vehicle") as VehicleProduct[];
-    const vehicle = vehicles[index % vehicles.length];
+    if (!vehicles.length) {
+      return [
+        { id: 1, type: "members", icon: Users, iconBg: "bg-primary-100", iconColor: "text-primary-600", avatars: true, title: "0 Members", subtitle: "Joined this group" },
+        { id: 2, type: "savings", icon: IndianRupee, iconBg: "bg-green-100", iconColor: "text-green-600", title: "₹0", subtitle: "Average Savings", highlight: true },
+        { id: 3, type: "location", icon: MapPin, iconBg: "bg-blue-100", iconColor: "text-blue-600", title: "Ahmedabad", subtitle: "Available" },
+      ];
+    }
+    const vehicle = vehicles[Math.abs(index) % vehicles.length];
     const membersJoined = vehicle.groupSize - vehicle.spotsLeft;
     const savings = vehicle.marketPrice - vehicle.groupPrice;
     
@@ -199,11 +214,15 @@ function ImageCarousel({ onImageChange }: { onImageChange?: (type: "property" | 
   });
 
   const primaryVehicle =
-    carProducts[vehicleIndices.carIndex] || vehicleProducts[0];
+    carProducts[vehicleIndices.carIndex] ?? vehicleProducts[0];
   const secondaryVehicle =
-    bikeProducts[vehicleIndices.bikeIndex] ||
-    vehicleProducts[1] ||
-    primaryVehicle;
+    bikeProducts[vehicleIndices.bikeIndex] ??
+    vehicleProducts[1] ??
+    primaryVehicle ??
+    vehicleProducts[0];
+
+  const carIndexForCards = primaryVehicle ? Math.max(0, vehicleProducts.indexOf(primaryVehicle)) : 0;
+  const bikeIndexForCards = secondaryVehicle ? Math.max(0, vehicleProducts.indexOf(secondaryVehicle)) : 0;
 
   const carouselImages = [
     {
@@ -230,9 +249,7 @@ function ImageCarousel({ onImageChange }: { onImageChange?: (type: "property" | 
       src: secondaryVehicle?.image || "/images/hero-car-2.webp",
       alt: secondaryVehicle ? secondaryVehicle.name : "Premium vehicle",
       fallback: "/images/hero-car-2.webp",
-      dataIndex: vehicleProducts.indexOf(
-        secondaryVehicle ?? vehicleProducts[0]
-      ), // index for floating cards
+      dataIndex: bikeIndexForCards,
     },
   ];
 
@@ -440,7 +457,7 @@ export default function Hero() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <Link href="/properties">
+              <Link href="/listings">
                 <motion.div
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}

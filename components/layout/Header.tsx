@@ -305,14 +305,14 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                               onMouseLeave={() => setIsCategoriesHovered(false)}
                             >
                               <Link
-                                href="/properties"
+                                href="/listings?category=property"
                                 className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                               >
                                 <Building2 className="w-4 h-4" />
                                 <span>Properties</span>
                               </Link>
                               <Link
-                                href="/vehicles"
+                                href="/listings?category=vehicle"
                                 className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                               >
                                 <Car className="w-4 h-4" />
@@ -621,7 +621,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                               {isUserDropdownCategoriesOpen && (
                                 <div className="pl-6 pr-2 py-1 space-y-0.5">
                                   <Link
-                                    href="/properties"
+                                    href="/listings?category=property"
                                     onClick={() => { setIsUserDropdownOpen(false); setIsUserDropdownCategoriesOpen(false); }}
                                     className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                   >
@@ -629,7 +629,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                                     <span>Properties</span>
                                   </Link>
                                   <Link
-                                    href="/vehicles"
+                                    href="/listings?category=vehicle"
                                     onClick={() => { setIsUserDropdownOpen(false); setIsUserDropdownCategoriesOpen(false); }}
                                     className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                   >

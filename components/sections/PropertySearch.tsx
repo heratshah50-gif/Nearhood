@@ -57,7 +57,7 @@ export default function PropertySearch({ variant = "default" }: PropertySearchPr
     .filter(Boolean)
     .join("&");
 
-  const searchHref = "/properties" + (searchParams ? "?" + searchParams : "");
+  const searchHref = "/listings" + (searchParams ? "?" + searchParams : "");
   const isCompact = variant === "compact";
 
   return (

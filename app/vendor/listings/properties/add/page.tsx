@@ -24,6 +24,8 @@ export default function AddPropertyPage() {
     deadline: "",
     highlights: "",
     layoutPlan: "",
+    superArea: "",
+    selectedAccommodation: [] as string[],
     selectedAmenities: [] as string[],
     aboutDeveloper: "",
     specifications: "",

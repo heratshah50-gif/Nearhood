@@ -48,7 +48,7 @@ export default function SignupCTA() {
           <div className="flex flex-col lg:flex-row items-center gap-6">
             {/* Request quote CTA */}
             <Link
-              href="/properties"
+              href="/listings"
               className="inline-flex items-center gap-2 px-8 py-4 bg-white text-primary-700 font-semibold rounded-xl hover:bg-neutral-50 transition-all shadow-lg"
             >
               Request a quote <ArrowRight className="w-5 h-5" />

@@ -62,7 +62,7 @@ function VehicleCard({ vehicle, onLoginClick, userInfo }: { vehicle: VehicleProd
               src={vehicle.image}
               alt={vehicle.name}
               fill
-              className="object-cover"
+              className="object-contain object-left p-4"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (

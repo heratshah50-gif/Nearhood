@@ -24,6 +24,8 @@ type PropertyRow = {
   address?: string;
   price?: string;
   area?: string;
+  superArea?: string;
+  accommodationTypes?: string[];
   bedrooms?: string;
   bathrooms?: string;
   amenities?: string[];
@@ -37,6 +39,8 @@ type PropertyRow = {
   deadline?: string;
   highlights?: string;
   layoutPlan?: string;
+  layoutPlanImage?: string;
+  brochure?: string;
   locationDetails?: string;
   aboutDeveloper?: string;
   specifications?: string;

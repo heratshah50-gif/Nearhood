@@ -214,7 +214,7 @@ export default function HowItWorks() {
               </p>
             </div>
             <Link
-              href="/properties"
+              href="/listings"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl shadow-lg shadow-primary-500/25 hover:shadow-xl hover:shadow-primary-500/30 transition-all whitespace-nowrap"
             >
               Start Your Journey

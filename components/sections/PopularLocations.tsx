@@ -17,7 +17,7 @@ const locationCounts: Record<string, string> = {
 const locations = AHMEDABAD_LOCATIONS.slice(0, 12).map((name) => ({
   name,
   count: locationCounts[name] || "20+",
-  href: `/properties?location=${encodeURIComponent(name)}`,
+  href: `/listings?location=${encodeURIComponent(name)}`,
 }));
 
 export default function PopularLocations() {

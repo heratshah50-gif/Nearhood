@@ -86,7 +86,7 @@ export default function UserPanel({ children }: UserPanelProps) {
 
   const navItems = [
     { label: "Home", href: "/", icon: Home },
-    { label: "Categories", href: "/properties", icon: Building2 },
+    { label: "Listings", href: "/listings", icon: Building2 },
     { label: "About Us", href: "/about", icon: Users },
     { label: "Contact Us", href: "/contact", icon: Phone },
   ];

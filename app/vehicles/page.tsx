@@ -48,7 +48,7 @@ function VehicleCard({ vehicle, onLoginClick, userInfo }: { vehicle: VehicleProd
               src={vehicle.image}
               alt={vehicle.name}
               fill
-              className={`object-contain p-4 ${
+              className={`object-contain object-left p-4 ${
                 vehicle.brand === "MG" && vehicle.model === "Hector"
                   ? "-scale-x-100"
                   : ""

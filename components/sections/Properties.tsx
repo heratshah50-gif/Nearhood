@@ -329,7 +329,7 @@ function VehicleCard({ vehicle, index }: { vehicle: VehicleProduct; index: numbe
               src={vehicle.image}
               alt={vehicle.name}
               fill
-              className="object-cover w-full h-full"
+              className="object-contain object-left w-full h-full p-4"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               unoptimized={vehicle.image.startsWith("http")}
             />
@@ -580,7 +580,7 @@ export default function Properties() {
 
             {/* View All Link */}
             <Link
-              href="/properties"
+              href="/listings"
               className="hidden lg:flex items-center gap-1 text-primary-600 font-medium hover:text-primary-700 transition-colors"
             >
               View all
@@ -628,7 +628,7 @@ export default function Properties() {
         {/* Mobile View All */}
         <div className="lg:hidden mt-8 text-center">
           <Link
-            href={activeGroupType === "properties" ? "/properties" : "/vehicles"}
+            href={activeGroupType === "properties" ? "/listings?category=property" : "/listings?category=vehicle"}
             className="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-xl shadow-sm border border-neutral-200 text-primary-600 font-medium hover:bg-primary-50 transition-colors"
           >
             View All {activeGroupType === "properties" ? "Properties" : "Vehicles"}

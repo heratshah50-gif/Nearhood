@@ -1,20 +1,8 @@
 import type { Metadata } from "next";
-import { Outfit, DM_Sans } from "next/font/google";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-display",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
-});
-
-const dmSans = DM_Sans({
-  variable: "--font-body",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
-});
+// Use system fonts to avoid Google Fonts fetch failures (network/firewall issues)
+const systemFontStack = "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
 
 export const metadata: Metadata = {
   title: "Nearhood | Buy Together. Save Together.",
@@ -52,8 +40,15 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth" style={{ backgroundColor: "#FFFFFF" }}>
       <body
-        className={`${outfit.variable} ${dmSans.variable} antialiased`}
-        style={{ fontFamily: "var(--font-body)", backgroundColor: "#FFFFFF", margin: 0, padding: 0 }}
+        className="antialiased"
+        style={{
+          fontFamily: systemFontStack,
+          backgroundColor: "#FFFFFF",
+          margin: 0,
+          padding: 0,
+          ["--font-display" as string]: systemFontStack,
+          ["--font-body" as string]: systemFontStack,
+        }}
       >
         {children}
       </body>

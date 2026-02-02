@@ -89,7 +89,7 @@ export default function GetBestDeals() {
                 </h3>
                 <p className="text-neutral-500 mb-6">{item.desc}</p>
                 <Link
-                  href="/properties"
+                  href="/listings"
                   className="text-primary-600 font-semibold hover:text-primary-700 transition-colors inline-flex items-center gap-1"
                 >
                   Learn more <span>→</span>

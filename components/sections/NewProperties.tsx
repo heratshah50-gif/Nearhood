@@ -57,10 +57,10 @@ function PropertyRow({ item, index }: { item: (typeof newListings)[0]; index: nu
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <p className="font-bold text-primary-600">{item.price}</p>
-            <Link href="/properties" className="px-4 py-2 rounded-lg bg-primary-500 text-white text-sm font-medium hover:bg-primary-600 transition-colors flex items-center gap-1">
+            <Link href="/listings" className="px-4 py-2 rounded-lg bg-primary-500 text-white text-sm font-medium hover:bg-primary-600 transition-colors flex items-center gap-1">
               <Phone className="w-4 h-4" /> View Number
             </Link>
-            <Link href="/properties" className="px-4 py-2 rounded-lg border border-neutral-200 text-neutral-700 text-sm font-medium hover:bg-neutral-50 transition-colors flex items-center gap-1">
+            <Link href="/listings" className="px-4 py-2 rounded-lg border border-neutral-200 text-neutral-700 text-sm font-medium hover:bg-neutral-50 transition-colors flex items-center gap-1">
               <MessageCircle className="w-4 h-4" /> Make Enquiry
             </Link>
           </div>
@@ -97,7 +97,7 @@ export default function NewProperties() {
 
         <div className="mt-10 text-center">
           <Link
-            href="/properties"
+            href="/listings"
             className="inline-flex items-center gap-2 px-6 py-3 bg-primary-500 text-white font-semibold rounded-xl hover:bg-primary-600 transition-colors"
           >
             View All Properties

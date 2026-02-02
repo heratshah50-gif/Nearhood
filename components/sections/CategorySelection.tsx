@@ -23,7 +23,7 @@ export default function CategorySelection() {
           {/* Primary category tabs */}
           <div className="flex items-center gap-2 md:gap-3 flex-wrap">
             <Link
-              href="/properties"
+              href="/listings?category=property"
               className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-primary-600 text-white text-xs md:text-sm font-semibold shadow-sm"
             >
               <Building2 className="w-4 h-4" />
@@ -31,7 +31,7 @@ export default function CategorySelection() {
             </Link>
 
             <Link
-              href="/vehicles"
+              href="/listings?category=vehicle"
               className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full bg-neutral-100 text-neutral-800 hover:bg-primary-50 hover:text-primary-700 text-xs md:text-sm font-medium border border-neutral-200 hover:border-primary-200 transition-colors"
             >
               <Car className="w-4 h-4" />
