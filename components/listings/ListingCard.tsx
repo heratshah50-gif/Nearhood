@@ -111,15 +111,10 @@ export default function ListingCard({ listing, onLoginClick, userInfo }: Listing
           </div>
         </div>
 
-        {/* Specifications */}
+        {/* Specifications - single line */}
         {listing.specs?.length > 0 && (
-          <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3 text-xs">
-            {listing.specs.map((spec) => (
-              <div key={spec.label} className="flex items-center gap-1.5">
-                <span className="text-neutral-400 font-medium">{spec.label}:</span>
-                <span className="text-neutral-600">{spec.value}</span>
-              </div>
-            ))}
+          <div className="mb-3 text-xs text-neutral-600 truncate" title={listing.specs.map((s) => `${s.label}: ${s.value}`).join(" • ")}>
+            {listing.specs.map((spec) => `${spec.label}: ${spec.value}`).join(" • ")}
           </div>
         )}
 
