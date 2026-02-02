@@ -48,7 +48,11 @@ function VehicleCard({ vehicle, onLoginClick, userInfo }: { vehicle: VehicleProd
               src={vehicle.image}
               alt={vehicle.name}
               fill
-              className="object-cover"
+              className={`object-contain p-4 ${
+                vehicle.brand === "MG" && vehicle.model === "Hector"
+                  ? "-scale-x-100"
+                  : ""
+              }`}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
@@ -379,7 +383,6 @@ export default function VehiclesPage() {
                     onChange={(e) => handleCategoryChange(e.target.value)}
                     className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
-                    <option value="">All</option>
                     <option value="property">Properties</option>
                     <option value="vehicle">Vehicle</option>
                   </select>
@@ -545,7 +548,7 @@ export default function VehiclesPage() {
                 </div>
               </div>
 
-              <div className="text-right mt-2 md:mt-3">
+              <div className="text-right mt-4 md:mt-6">
                 <p className="text-xs text-neutral-500 uppercase tracking-wide mb-1">
                   Showing
                 </p>

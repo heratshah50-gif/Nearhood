@@ -80,6 +80,21 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
     };
   }, [isOpen]);
 
+  const handleTempBypass = () => {
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem(
+        "nearhood_user",
+        JSON.stringify({
+          phoneNumber: "9999999999",
+          name: "Temp User",
+        })
+      );
+      window.dispatchEvent(new Event("userLoggedIn"));
+    }
+    onSuccess?.(false);
+    onClose();
+  };
+
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (phoneNumber.length !== 10) return;
@@ -302,6 +317,15 @@ export default function LoginModal({ isOpen, onClose, onSuccess }: LoginModalPro
                   className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors"
                 >
                   <X className="w-5 h-5" />
+                </button>
+
+                {/* Temporary bypass login button (for testing only) */}
+                <button
+                  type="button"
+                  onClick={handleTempBypass}
+                  className="absolute bottom-3 right-4 text-[10px] px-2 py-1 rounded-full bg-white/15 border border-white/40 text-white font-medium hover:bg-white/25 transition-colors"
+                >
+                  Temp login
                 </button>
                 
                 <div className="flex items-center gap-3 mb-2">

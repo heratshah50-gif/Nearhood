@@ -189,7 +189,7 @@ export default function PropertiesPage() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("property");
   const [possessionStatus, setPossessionStatus] = useState("");
   const [configurationType, setConfigurationType] = useState("");
   const [budget, setBudget] = useState("");
@@ -283,7 +283,7 @@ export default function PropertiesPage() {
   const filteredProperties = useMemo(() => {
     return allProperties.filter((prop) => {
       // Category: on properties page we only show properties; "vehicle" redirects to /vehicles
-      if (selectedCategory && selectedCategory !== "property") return false;
+      if (selectedCategory !== "property") return false;
 
       // Search query filter
       if (searchQuery.trim()) {
@@ -428,7 +428,6 @@ export default function PropertiesPage() {
                         onChange={(e) => handleCategoryChange(e.target.value)}
                         className="w-full px-3 py-2 border border-neutral-300 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                       >
-                        <option value="">All</option>
                         <option value="property">Properties</option>
                         <option value="vehicle">Vehicle</option>
                       </select>

@@ -19,5 +19,7 @@ const IMAGE_IDS = [
 
 export function getPropertyImage(index: number, size = "800x600"): string {
   const [w, h] = size.split("x").map(Number);
-  return `https://images.unsplash.com/photo-${IMAGE_IDS[index % IMAGE_IDS.length]}?w=${w || 800}&h=${h || 600}&fit=crop`;
+  return `https://images.unsplash.com/photo-${IMAGE_IDS[index % IMAGE_IDS.length]}?w=${
+    w || 800
+  }&h=${h || 600}&fit=crop`;
 }

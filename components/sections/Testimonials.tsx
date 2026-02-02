@@ -295,7 +295,7 @@ export default function Testimonials() {
           </div>
 
           {/* Mobile Carousel */}
-          <div className="lg:hidden">
+          <div className="lg:hidden mt-4">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
@@ -313,7 +313,7 @@ export default function Testimonials() {
           </div>
 
           {/* Navigation */}
-          <div className="flex items-center justify-center gap-4 mt-8 lg:mt-6">
+          <div className="flex items-center justify-center gap-4 mt-8 lg:mt-0 lg:pb-4">
             <button
               onClick={prevSlide}
               className="w-12 h-12 rounded-full bg-white shadow-lg border border-neutral-100 flex items-center justify-center text-neutral-600 hover:text-primary-600 hover:border-primary-200 transition-all"

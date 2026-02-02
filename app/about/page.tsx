@@ -11,12 +11,19 @@ import {
   ShieldCheck,
   ArrowRight,
   Star,
+  Car,
+  Building2,
 } from "lucide-react";
 import Image from "next/image";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import LoginModal from "@/components/auth/LoginModal";
 import { useRouter } from "next/navigation";
+import { ALL_PROPERTIES } from "@/lib/properties-data";
+import { getProductsByCategory } from "@/lib/products-data";
+
+const propertyCount = ALL_PROPERTIES.length;
+const vehicleCount = getProductsByCategory("vehicle").length;
 
 export default function AboutPage() {
   const router = useRouter();
@@ -38,35 +45,42 @@ export default function AboutPage() {
                 className="text-3xl md:text-4xl lg:text-5xl font-bold text-neutral-900 mb-4"
                 style={{ fontFamily: "var(--font-display)" }}
               >
-                Save more on your{" "}
-                <span className="text-primary-600">dream home</span>, together.
+                Bulk buy{" "}
+                <span className="text-primary-600">Properties & Vehicles</span>, together.
               </h1>
               <p className="text-neutral-600 text-base md:text-lg mb-6 md:mb-8 max-w-xl">
-                Nearhood is your home buying partner. We bring homebuyers
-                together into powerful groups, negotiate directly with
-                developers, and unlock prices that individual buyers can&apos;t
-                get alone.
+                Nearhood is your bulk-buy partner. We bring buyers together
+                into powerful groups for properties and vehicles, negotiate
+                with developers and dealers, and unlock prices that individual
+                buyers can&apos;t get alone.
               </p>
 
-              <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="rounded-2xl bg-white shadow-sm border border-primary-100/70 p-4">
                   <p className="text-xs font-semibold text-primary-600 uppercase mb-1">
-                    Savings Unlocked
+                    Properties
                   </p>
-                  <p className="text-2xl font-bold text-neutral-900">₹25 Cr+</p>
+                  <p className="text-2xl font-bold text-neutral-900">{propertyCount}+</p>
                   <p className="text-xs text-neutral-500 mt-1">
-                    Total value unlocked for Nearhood buyers across projects.
+                    Bulk group deals on apartments, villas & more.
                   </p>
                 </div>
-                <div className="rounded-2xl bg-gradient-to-br from-primary-600 via-red-500 to-rose-500 text-white p-4 shadow-md">
-                  <p className="text-xs font-semibold uppercase mb-1">
-                    Buyers Empowered
+                <div className="rounded-2xl bg-white shadow-sm border border-primary-100/70 p-4">
+                  <p className="text-xs font-semibold text-primary-600 uppercase mb-1">
+                    Vehicles
                   </p>
-                  <p className="text-2xl font-bold">150+ buyers</p>
-                  <p className="text-xs text-white/80 mt-1">
-                    Individuals who joined groups and negotiated as one voice.
+                  <p className="text-2xl font-bold text-neutral-900">{vehicleCount}+</p>
+                  <p className="text-xs text-neutral-500 mt-1">
+                    Cars & bikes with bulk-buy savings.
                   </p>
                 </div>
+              </div>
+              <div className="rounded-2xl bg-gradient-to-br from-primary-600 via-red-500 to-rose-500 text-white p-4 shadow-md mb-8">
+                <p className="text-xs font-semibold uppercase mb-1">Buyers Empowered</p>
+                <p className="text-2xl font-bold">150+ buyers</p>
+                <p className="text-xs text-white/80 mt-1">
+                  Individuals who joined bulk-buy groups for properties and vehicles.
+                </p>
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
@@ -74,7 +88,14 @@ export default function AboutPage() {
                   onClick={() => router.push("/properties")}
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all"
                 >
-                  Explore group deals
+                  Explore properties
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => router.push("/vehicles")}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full border border-primary-300 bg-white text-primary-700 text-sm font-semibold hover:bg-primary-50 transition-all"
+                >
+                  Explore vehicles
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <button
@@ -108,15 +129,29 @@ export default function AboutPage() {
                 <div className="grid gap-4 mb-6">
                   <div className="flex items-start gap-3">
                     <div className="mt-1 w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-primary-600">
-                      <Home className="w-4 h-4" />
+                      <Building2 className="w-4 h-4" />
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-neutral-900">
-                        New launches & premium inventory
+                        Properties: bulk deals on real estate
                       </p>
                       <p className="text-xs text-neutral-600">
-                        Access curated under-construction and ready projects
-                        across top micro-markets.
+                        New launches, apartments, villas & commercial—curated
+                        projects across top micro-markets.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="mt-1 w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center text-primary-600">
+                      <Car className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-neutral-900">
+                        Vehicles: bulk deals on cars & bikes
+                      </p>
+                      <p className="text-xs text-neutral-600">
+                        Join buyer groups for cars and bikes—same transparent
+                        bulk-buy savings as properties.
                       </p>
                     </div>
                   </div>
@@ -129,8 +164,8 @@ export default function AboutPage() {
                         Negotiated as one, priced as a group
                       </p>
                       <p className="text-xs text-neutral-600">
-                        Your Relationship Manager and Nearhood&apos;s team
-                        negotiate on behalf of the entire buyer group.
+                        We negotiate with developers and dealers on behalf of
+                        the entire bulk-buy group.
                       </p>
                     </div>
                   </div>
@@ -153,7 +188,7 @@ export default function AboutPage() {
                 <div className="flex items-center justify-between gap-3 rounded-2xl bg-white/70 backdrop-blur border border-primary-100 px-4 py-3">
                   <div>
                     <p className="text-xs font-semibold text-primary-700 uppercase tracking-wide">
-                      Trusted by modern homebuyers
+                      Trusted by property & vehicle buyers
                     </p>
                     <p className="text-xs text-neutral-600">
                       From first-time buyers to upgraders and NRIs.
@@ -184,20 +219,22 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-4 text-sm md:text-base text-neutral-700 leading-relaxed">
                 <p>
-                  In every project, there&apos;s always a buyer who discovers
-                  later that a neighbour, colleague or friend paid less for the
-                  same home. Nearhood was created to end that regret.
+                  Whether it&apos;s a property or a vehicle, there&apos;s always
+                  someone who paid less for the same deal. Nearhood was created
+                  to end that regret—through bulk buying for properties and
+                  vehicles.
                 </p>
                 <p>
-                  Instead of negotiating alone, our buyers join curated groups
-                  for the same project or micro-market. That collective demand
-                  gives them the leverage usually reserved for institutional
-                  investors—without losing the personal, hand-held experience.
+                  Instead of negotiating alone, our buyers join curated
+                  bulk-buy groups for the same project, micro-market, or
+                  vehicle category. That collective demand gives them leverage
+                  usually reserved for institutional buyers—without losing a
+                  personal, guided experience.
                 </p>
                 <p>
-                  From the first project shortlist to final booking, our team,
-                  data, and relationships with developers work together to help
-                  you buy smarter, safer and at better prices.
+                  From shortlisting properties and vehicles to final booking,
+                  our team and partnerships with developers and dealers help
+                  you buy smarter, safer, and at better prices.
                 </p>
               </div>
             </div>
@@ -213,14 +250,14 @@ export default function AboutPage() {
                       Our Mission
                     </p>
                     <p className="text-sm font-semibold text-neutral-900">
-                      Make better homes more financially accessible
+                      Make properties and vehicles more financially accessible
                     </p>
                   </div>
                 </div>
                 <p className="text-sm text-neutral-700 leading-relaxed">
-                  We want every serious homebuyer to feel confident that they
-                  bought at a fair, transparent, and competitive price—backed by
-                  the power of a group.
+                  We want every serious buyer—whether for a property or a
+                  vehicle—to feel confident they bought at a fair, transparent,
+                  and competitive price, backed by the power of bulk buying.
                 </p>
               </div>
 
@@ -239,14 +276,14 @@ export default function AboutPage() {
                   </div>
                 </div>
                 <p className="text-sm text-white/90 leading-relaxed mb-3">
-                  Nearhood is built around homebuyer communities, not just
-                  listings. We care about who you buy with as much as what you
-                  buy.
+                  Nearhood is built around bulk-buy communities for properties
+                  and vehicles, not just listings. We care about who you buy
+                  with as much as what you buy.
                 </p>
                 <p className="text-xs text-white/80">
-                  No noisy portals. No random calls. Just curated projects,
-                  verified buyers, and one simple goal—help you save more on a
-                  better home.
+                  No noisy portals. No random calls. Just curated properties &
+                  vehicles, verified buyers, and one goal—help you save more
+                  through bulk buying.
                 </p>
               </div>
             </div>
@@ -262,34 +299,35 @@ export default function AboutPage() {
                 className="text-2xl md:text-3xl font-bold text-neutral-900 mb-3"
                 style={{ fontFamily: "var(--font-display)" }}
               >
-                Group buying power, wrapped in a personal home buying journey.
+                Bulk buying power for properties and vehicles.
               </h2>
               <p className="text-sm md:text-base text-neutral-600">
-                We combine the power of collective negotiation with the comfort
-                of a guided, one-on-one experience.
+                We combine the power of collective negotiation with a guided,
+                one-on-one experience—whether you&apos;re buying a property or
+                a vehicle.
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
               {[
                 {
-                  title: "Real group savings",
-                  desc: "Leverage the strength of organised buyer groups to unlock pre-launch and volume-based pricing.",
+                  title: "Real bulk-buy savings",
+                  desc: "Leverage organised buyer groups to unlock volume-based pricing on properties and vehicles.",
                   icon: Users,
                 },
                 {
                   title: "Data-backed decisions",
-                  desc: "We track pricing, inventory and offers across projects so you never negotiate in the dark.",
+                  desc: "We track pricing and inventory across properties and vehicles so you never negotiate in the dark.",
                   icon: Target,
                 },
                 {
-                  title: "Developer partnerships",
-                  desc: "Work only with trusted developers who are comfortable offering group benefits transparently.",
+                  title: "Developer & dealer partnerships",
+                  desc: "Work with trusted developers and dealers who offer transparent bulk-buy benefits.",
                   icon: Handshake,
                 },
                 {
                   title: "End-to-end support",
-                  desc: "From shortlist to site visit and booking, your Relationship Manager walks every step with you.",
+                  desc: "From shortlist to visit and booking—for properties or vehicles—we walk every step with you.",
                   icon: ShieldCheck,
                 },
               ].map((item) => {
@@ -324,7 +362,7 @@ export default function AboutPage() {
                 className="text-2xl md:text-3xl font-bold text-neutral-900 mb-3"
                 style={{ fontFamily: "var(--font-display)" }}
               >
-                Simple, stress-free steps to your group-powered home purchase.
+                Simple steps to your bulk-buy purchase—property or vehicle.
               </h2>
             </div>
 
@@ -333,18 +371,18 @@ export default function AboutPage() {
                 {[
                   {
                     step: "01",
-                    title: "Shortlist projects with us",
-                    desc: "Tell us your budget, micro-location and preferences. We map them to high-potential projects.",
+                    title: "Shortlist with us",
+                    desc: "Tell us your budget and preferences—for a property or vehicle. We map them to the best options.",
                   },
                   {
                     step: "02",
-                    title: "Join or start a buyer group",
-                    desc: "Get matched with buyers looking at similar configurations in the same project or area.",
+                    title: "Join or start a bulk-buy group",
+                    desc: "Get matched with buyers looking at similar properties or vehicles in the same deal.",
                   },
                   {
                     step: "03",
                     title: "Visit, evaluate, and decide",
-                    desc: "Plan site visits and virtual tours with our team so you can compare options confidently.",
+                    desc: "Plan site visits or test drives with our team so you can compare options confidently.",
                   },
                 ].map((item) => (
                   <div
@@ -367,17 +405,17 @@ export default function AboutPage() {
                   {
                     step: "04",
                     title: "We negotiate as a group",
-                    desc: "Using the group’s combined demand, we negotiate directly with developers for better slabs, views and payment plans.",
+                    desc: "Using the group’s combined demand, we negotiate with developers and dealers for better prices and terms.",
                   },
                   {
                     step: "05",
-                    title: "Lock in your preferred unit",
-                    desc: "Once the group offer is finalised, you confirm your specific unit with full pricing transparency.",
+                    title: "Lock in your preferred choice",
+                    desc: "Once the bulk-buy offer is finalised, you confirm your unit or vehicle with full pricing transparency.",
                   },
                   {
                     step: "06",
-                    title: "Move in, without regret",
-                    desc: "You buy with the comfort that others in the project purchased at the same negotiated band.",
+                    title: "Buy without regret",
+                    desc: "You buy with the comfort that others in the group got the same negotiated deal.",
                   },
                 ].map((item) => (
                   <div
@@ -414,13 +452,22 @@ export default function AboutPage() {
                   </ul>
                 </div>
 
-                <button
-                  onClick={() => router.push("/properties")}
-                  className="mt-5 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-white text-primary-700 text-sm font-semibold hover:bg-neutral-50 transition-colors"
-                >
-                  See active group deals
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+                <div className="flex flex-wrap gap-2 mt-5">
+                  <button
+                    onClick={() => router.push("/properties")}
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-white text-primary-700 text-sm font-semibold hover:bg-neutral-50 transition-colors"
+                  >
+                    Properties
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => router.push("/vehicles")}
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-white/20 text-white text-sm font-semibold hover:bg-white/30 transition-colors border border-white/40"
+                  >
+                    Vehicles
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           </section>
@@ -430,18 +477,18 @@ export default function AboutPage() {
             <div className="rounded-3xl bg-white border border-neutral-200 shadow-sm px-5 py-6 md:px-8 md:py-7 lg:px-10 lg:py-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div className="max-w-md">
                 <p className="text-xs font-semibold text-primary-600 uppercase tracking-wide mb-2">
-                  Developers & communities
+                  Developers, dealers & communities
                 </p>
                 <p
                   className="text-lg md:text-xl font-bold text-neutral-900 mb-2"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
-                  Trusted by leading developers and modern homebuyers.
+                  Trusted by developers, dealers and bulk-buy communities.
                 </p>
                 <p className="text-xs md:text-sm text-neutral-600">
-                  We continuously expand our relationships with reputed
-                  developers so your group can access better inventory, payment
-                  plans and launch windows.
+                  We expand our relationships with reputed developers and
+                  dealers so your bulk-buy group gets better inventory, payment
+                  plans and pricing on properties and vehicles.
                 </p>
               </div>
 
@@ -472,20 +519,19 @@ export default function AboutPage() {
                   Buyer Story
                 </p>
                 <p className="text-sm md:text-base text-neutral-700 mb-4 leading-relaxed">
-                  &quot;Nearhood helped us compare multiple projects in our
-                  preferred neighbourhood and then plugged us into a group that
-                  was already in advanced discussions with the developer. We got
-                  better views, a more relaxed payment plan, and the comfort
-                  that others in our tower had secured a similar deal.&quot;
+                  &quot;Nearhood helped us compare multiple options—we were
+                  looking at both a new home and a car. We joined bulk-buy
+                  groups for each and got better prices than going alone. Same
+                  transparent process, same peace of mind.&quot;
                 </p>
               </div>
               <div className="flex items-center justify-between gap-3 pt-2">
                 <div>
                   <p className="text-sm font-semibold text-neutral-900">
-                    A modern homebuyer
+                    A bulk-buy member
                   </p>
                   <p className="text-xs text-neutral-500">
-                    Ahmedabad • Upgrading from 2 BHK to 3 BHK
+                    Ahmedabad • Property & vehicle buyer
                   </p>
                 </div>
                 <div className="flex items-center gap-1 text-amber-400">
@@ -505,11 +551,11 @@ export default function AboutPage() {
                   className="text-xl md:text-2xl font-bold mb-3"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
-                  Join a Nearhood buyer group for your next home.
+                  Join a bulk-buy group for your next property or vehicle.
                 </h3>
                 <p className="text-sm text-white/90 mb-4">
-                  Tell us what you&apos;re looking for and we&apos;ll show you
-                  live group opportunities in your preferred locations.
+                  Tell us what you&apos;re looking for—property or vehicle—and
+                  we&apos;ll show you live bulk-buy opportunities.
                 </p>
               </div>
 
@@ -518,7 +564,14 @@ export default function AboutPage() {
                   onClick={() => router.push("/properties")}
                   className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-white text-primary-700 text-sm font-semibold hover:bg-neutral-50 transition-colors"
                 >
-                  View active properties
+                  View properties
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => router.push("/vehicles")}
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-white text-primary-700 text-sm font-semibold hover:bg-neutral-50 transition-colors"
+                >
+                  View vehicles
                   <ArrowRight className="w-4 h-4" />
                 </button>
                 <button

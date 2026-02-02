@@ -180,6 +180,31 @@ function ImageCarousel({ onImageChange }: { onImageChange?: (type: "property" | 
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
 
+  // Use real vehicle images from listings where available
+  const vehicleProducts = getProductsByCategory("vehicle") as VehicleProduct[];
+  const carProducts = vehicleProducts.filter((v) => v.subcategory === "car");
+  const bikeProducts = vehicleProducts.filter((v) => v.subcategory === "bike");
+
+  // Pick one random car and one random bike (stable for the lifetime of the component)
+  const [vehicleIndices] = useState(() => {
+    const carIndex =
+      carProducts.length > 0
+        ? Math.floor(Math.random() * carProducts.length)
+        : 0;
+    const bikeIndex =
+      bikeProducts.length > 0
+        ? Math.floor(Math.random() * bikeProducts.length)
+        : 0;
+    return { carIndex, bikeIndex };
+  });
+
+  const primaryVehicle =
+    carProducts[vehicleIndices.carIndex] || vehicleProducts[0];
+  const secondaryVehicle =
+    bikeProducts[vehicleIndices.bikeIndex] ||
+    vehicleProducts[1] ||
+    primaryVehicle;
+
   const carouselImages = [
     {
       type: "property" as const,
@@ -189,10 +214,10 @@ function ImageCarousel({ onImageChange }: { onImageChange?: (type: "property" | 
     },
     {
       type: "vehicle" as const,
-      src: getVehicleImage("car", 0, "800x1000"),
-      alt: "Premium vehicle",
-      fallback: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=1000&fit=crop&auto=format&q=80",
-      dataIndex: 0,
+      src: primaryVehicle?.image || "/images/hero-car-1.webp",
+      alt: primaryVehicle ? primaryVehicle.name : "Premium vehicle",
+      fallback: "/images/hero-car-1.webp",
+      dataIndex: vehicleProducts.indexOf(primaryVehicle ?? vehicleProducts[0]), // use actual index for floating cards
     },
     {
       type: "property" as const,
@@ -202,10 +227,12 @@ function ImageCarousel({ onImageChange }: { onImageChange?: (type: "property" | 
     },
     {
       type: "vehicle" as const,
-      src: getVehicleImage("car", 1, "800x1000"),
-      alt: "Premium vehicle",
-      fallback: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=1000&fit=crop&auto=format&q=80",
-      dataIndex: 1,
+      src: secondaryVehicle?.image || "/images/hero-car-2.webp",
+      alt: secondaryVehicle ? secondaryVehicle.name : "Premium vehicle",
+      fallback: "/images/hero-car-2.webp",
+      dataIndex: vehicleProducts.indexOf(
+        secondaryVehicle ?? vehicleProducts[0]
+      ), // index for floating cards
     },
   ];
 
@@ -254,6 +281,8 @@ function ImageCarousel({ onImageChange }: { onImageChange?: (type: "property" | 
     setCurrentIndex(index);
   };
 
+  const isVehicleSlide = carouselImages[currentIndex]?.type === "vehicle";
+
   return (
     <div 
       className="relative w-full h-full"
@@ -275,7 +304,9 @@ function ImageCarousel({ onImageChange }: { onImageChange?: (type: "property" | 
               src={getImageSrc(currentIndex)}
               alt={carouselImages[currentIndex].alt}
               fill
-              className="object-cover w-full h-full"
+              className={`w-full h-full ${
+                isVehicleSlide ? "object-contain p-6" : "object-cover"
+              }`}
               priority={currentIndex === 0}
               sizes="(max-width: 1024px) 0vw, 50vw"
               unoptimized={true}
@@ -286,7 +317,9 @@ function ImageCarousel({ onImageChange }: { onImageChange?: (type: "property" | 
               src={getImageSrc(currentIndex)}
               alt={carouselImages[currentIndex].alt}
               fill
-              className="object-cover w-full h-full"
+              className={`w-full h-full ${
+                isVehicleSlide ? "object-contain p-6" : "object-cover"
+              }`}
               priority={currentIndex === 0}
               sizes="(max-width: 1024px) 0vw, 50vw"
             />
@@ -343,15 +376,16 @@ export default function Hero() {
 
 
   return (
-    <section className="relative min-h-screen bg-white overflow-x-hidden pt-16 md:pt-20">
+    <section className="relative min-h-screen bg-white overflow-x-hidden pt-0">
       {/* Subtle background pattern */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 right-0 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-primary-100/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
         <div className="absolute bottom-0 left-0 w-[200px] h-[200px] md:w-[400px] md:h-[400px] bg-primary-50 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3" />
       </div>
 
-      <div className="container-custom relative z-10 pt-6 pb-4 md:pt-8 md:pb-6 lg:pt-12 lg:pb-8 overflow-x-hidden">
-        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-center">
+      {/* Keep hero text vertically consistent across breakpoints */}
+      <div className="container-custom relative z-10 pt-20 pb-4 md:pt-28 md:pb-6 lg:pt-36 lg:pb-8 overflow-x-hidden">
+        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 lg:gap-16 items-start">
           {/* Left Content */}
           <div>
             {/* Badge */}
@@ -451,7 +485,7 @@ export default function Hero() {
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="relative hidden lg:block overflow-visible"
+            className="relative hidden lg:block overflow-visible mt-6"
           >
             {/* Image Carousel Container */}
             <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/5] w-full max-w-full">

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Search, Plus, Upload, X } from "lucide-react";
+import { Search, Plus, Upload, X, ImageIcon } from "lucide-react";
 import ThemedSelect from "@/components/vendor/ThemedSelect";
 import { getPropertyImage } from "@/lib/property-images";
 
@@ -43,8 +43,19 @@ export default function MyPropertiesPage() {
   const [form, setForm] = useState({
     name: "",
     location: "",
+    address: "",
+    locationDetails: "",
     type: "Apartments",
     units: "0",
+    groupSize: "",
+    targetPrice: "",
+    developerPrice: "",
+    deadline: "",
+    highlights: "",
+    layoutPlan: "",
+    amenities: "",
+    aboutDeveloper: "",
+    specifications: "",
   });
 
   const filtered = rows.filter((r) => {
@@ -68,12 +79,28 @@ export default function MyPropertiesPage() {
       location: form.location || "Ahmedabad",
       type: form.type,
       units: form.units || "0",
-      groups: "0",
+      groups: form.groupSize || "0",
       status: "Upcoming",
       image: getPropertyImage((nextId - 1) % 5, "80x60"),
     };
     setRows([newRow, ...rows]);
-    setForm({ name: "", location: "", type: "Apartments", units: "0" });
+    setForm({
+      name: "",
+      location: "",
+      address: "",
+      locationDetails: "",
+      type: "Apartments",
+      units: "0",
+      groupSize: "",
+      targetPrice: "",
+      developerPrice: "",
+      deadline: "",
+      highlights: "",
+      layoutPlan: "",
+      amenities: "",
+      aboutDeveloper: "",
+      specifications: "",
+    });
     setIsAddOpen(false);
   };
 
@@ -259,27 +286,48 @@ export default function MyPropertiesPage() {
             </div>
 
             {addMode === "single" ? (
-              <form onSubmit={handleAddSingle} className="space-y-4">
+              <form onSubmit={handleAddSingle} className="space-y-4 max-h-[65vh] overflow-y-auto pr-2">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">Property name</label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">Property images <span className="text-red-500">*</span></label>
+                  <label className="block border-2 border-dashed border-neutral-300 rounded-xl p-5 flex flex-col items-center justify-center gap-2 bg-neutral-50 hover:bg-neutral-100 cursor-pointer transition-colors">
+                    <ImageIcon className="w-8 h-8 text-primary-500" />
+                    <p className="text-sm font-medium text-neutral-700">Upload property images</p>
+                    <p className="text-xs text-neutral-500">Click to select • Min 1 image required</p>
+                    <input type="file" accept="image/*" multiple required className="hidden" />
+                  </label>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">Property name <span className="text-red-500">*</span></label>
                   <input
                     type="text"
                     value={form.name}
                     onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                    placeholder="e.g. Nearhood Heights"
+                    placeholder="e.g. Godrej Garden City"
+                    className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">Location / Address <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    value={form.address}
+                    onChange={(e) => setForm((f) => ({ ...f, address: e.target.value }))}
+                    placeholder="e.g. SG Highway, Ahmedabad"
                     className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
                     required
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-1">City</label>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">City <span className="text-red-500">*</span></label>
                     <input
                       type="text"
                       value={form.location}
                       onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
                       placeholder="e.g. Ahmedabad"
                       className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
+                      required
                     />
                   </div>
                   <div>
@@ -304,18 +352,130 @@ export default function MyPropertiesPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-1">Units available</label>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">Group size (members) <span className="text-red-500">*</span></label>
                     <input
                       type="number"
-                      min={0}
-                      value={form.units}
-                      onChange={(e) => setForm((f) => ({ ...f, units: e.target.value }))}
+                      min={1}
+                      value={form.groupSize}
+                      onChange={(e) => setForm((f) => ({ ...f, groupSize: e.target.value }))}
+                      placeholder="e.g. 4"
                       className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">Last day to join <span className="text-red-500">*</span></label>
+                    <input
+                      type="date"
+                      value={form.deadline}
+                      onChange={(e) => setForm((f) => ({ ...f, deadline: e.target.value }))}
+                      className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
+                      required
                     />
                   </div>
                 </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">Target price (₹) <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      value={form.targetPrice}
+                      onChange={(e) => setForm((f) => ({ ...f, targetPrice: e.target.value }))}
+                      placeholder="e.g. 5.50 Cr"
+                      className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">Developer price (₹) <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      value={form.developerPrice}
+                      onChange={(e) => setForm((f) => ({ ...f, developerPrice: e.target.value }))}
+                      placeholder="e.g. 5.98 Cr"
+                      className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">Units available</label>
+                  <input
+                    type="number"
+                    min={0}
+                    value={form.units}
+                    onChange={(e) => setForm((f) => ({ ...f, units: e.target.value }))}
+                    className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">Highlights <span className="text-red-500">*</span></label>
+                  <textarea
+                    value={form.highlights}
+                    onChange={(e) => setForm((f) => ({ ...f, highlights: e.target.value }))}
+                    placeholder="Key USPs: clubhouse, green space, security..."
+                    rows={2}
+                    className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300 resize-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">Layout plan <span className="text-red-500">*</span></label>
+                  <textarea
+                    value={form.layoutPlan}
+                    onChange={(e) => setForm((f) => ({ ...f, layoutPlan: e.target.value }))}
+                    placeholder="Floor plans, configurations..."
+                    rows={2}
+                    className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300 resize-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">Amenities <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    value={form.amenities}
+                    onChange={(e) => setForm((f) => ({ ...f, amenities: e.target.value }))}
+                    placeholder="Swimming Pool, Gym, Parking (comma-separated)"
+                    className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">Location details <span className="text-red-500">*</span></label>
+                  <textarea
+                    value={form.locationDetails}
+                    onChange={(e) => setForm((f) => ({ ...f, locationDetails: e.target.value }))}
+                    placeholder="Full address, nearby landmarks, connectivity..."
+                    rows={2}
+                    className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300 resize-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">About developer <span className="text-red-500">*</span></label>
+                  <textarea
+                    value={form.aboutDeveloper}
+                    onChange={(e) => setForm((f) => ({ ...f, aboutDeveloper: e.target.value }))}
+                    placeholder="Builder background, past projects..."
+                    rows={2}
+                    className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300 resize-none"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">Specifications <span className="text-red-500">*</span></label>
+                  <textarea
+                    value={form.specifications}
+                    onChange={(e) => setForm((f) => ({ ...f, specifications: e.target.value }))}
+                    placeholder="Construction materials, dimensions..."
+                    rows={2}
+                    className="w-full px-3 py-2.5 rounded-lg border border-neutral-300 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-300 resize-none"
+                    required
+                  />
+                </div>
 
-                <div className="mt-4 flex items-center justify-between gap-3">
+                <div className="mt-4 flex items-center justify-between gap-3 pt-4 border-t border-neutral-200">
                   <button
                     type="button"
                     onClick={() => setIsAddOpen(false)}

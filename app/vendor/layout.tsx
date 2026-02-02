@@ -25,6 +25,7 @@ const TITLES: Record<string, string> = {
   "/vendor": "Dashboard",
   "/vendor/listings": "Listings",
   "/vendor/listings/properties": "Property Listings",
+  "/vendor/listings/properties/add": "Add New Property",
   "/vendor/listings/vehicles": "Vehicle Listings",
   "/vendor/inquiries": "Group Inquiries",
   "/vendor/offers": "Offers & Deals",

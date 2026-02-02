@@ -27,8 +27,27 @@ export default function VendorLoginPage() {
     setIsLoading(false);
   };
 
+  const handleTempLogin = async () => {
+    setError("");
+    setIsLoading(true);
+    await new Promise((r) => setTimeout(r, 400));
+    if (typeof window !== "undefined") {
+      window.sessionStorage.setItem("nearhood_vendor", "1");
+    }
+    router.push("/vendor");
+    setIsLoading(false);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 via-white to-primary-100 p-4">
+      {/* Temporary quick-login button for testing */}
+      <button
+        type="button"
+        onClick={handleTempLogin}
+        className="fixed top-4 right-4 z-50 rounded-full bg-primary-600 hover:bg-primary-700 text-white text-xs font-semibold px-3 py-1.5 shadow-md hover:shadow-lg transition-all"
+      >
+        Temp Login
+      </button>
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-8">

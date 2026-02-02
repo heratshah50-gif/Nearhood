@@ -71,6 +71,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
+  const [isUserDropdownCategoriesOpen, setIsUserDropdownCategoriesOpen] = useState(false);
   const [isCategoriesHovered, setIsCategoriesHovered] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   
@@ -107,6 +108,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
     }
     setUserInfo(null);
     setIsUserDropdownOpen(false);
+    setIsUserDropdownCategoriesOpen(false);
     router.refresh();
   };
 
@@ -124,6 +126,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
         const target = e.target as HTMLElement;
         if (!target.closest(".user-dropdown-container")) {
           setIsUserDropdownOpen(false);
+          setIsUserDropdownCategoriesOpen(false);
         }
       };
       window.addEventListener("click", handleClickOutside);
@@ -215,10 +218,10 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                     </div>
                   </div>
 
-                  {/* Select Property / Keyword */}
+                  {/* Select Property / Vehicle / Keyword */}
                   <div className="flex-1">
                     <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400 mb-1">
-                      Select Property
+                      {isVehiclesPage ? "Select Vehicle" : "Select Property"}
                     </p>
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary-400" />
@@ -369,17 +372,17 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
                             transition={{ duration: 0.2 }}
-                            className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-2xl border border-neutral-200 overflow-hidden z-50"
+                            className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl shadow-primary-500/10 border border-primary-200 overflow-hidden z-50 user-dropdown-container"
                           >
                             {/* User Info Header */}
-                            <div className="px-4 py-3 border-b border-neutral-100 bg-neutral-50">
+                            <div className="px-4 py-3 border-b border-primary-100 bg-primary-50/80">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center">
-                                  <User className="w-5 h-5 text-neutral-600" />
+                                <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                                  <User className="w-5 h-5 text-primary-600" />
                                 </div>
                                 <div className="flex-1 min-w-0">
                                   <p className="text-sm font-semibold text-neutral-900 truncate">{userInfo.name}</p>
-                                  <p className="text-xs text-neutral-500 truncate">{formatPhoneNumber(userInfo.phoneNumber)}</p>
+                                  <p className="text-xs text-primary-600/80 truncate">{formatPhoneNumber(userInfo.phoneNumber)}</p>
                                 </div>
                               </div>
                             </div>
@@ -391,23 +394,46 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                                 <Link
                                   href="/"
                                   onClick={() => setIsUserDropdownOpen(false)}
-                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                 >
                                   <Home className="w-4 h-4" />
                                   <span>Home</span>
                                 </Link>
-                                <Link
-                                  href="/properties"
-                                  onClick={() => setIsUserDropdownOpen(false)}
-                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                <button
+                                  type="button"
+                                  onClick={() => setIsUserDropdownCategoriesOpen((prev) => !prev)}
+                                  className="w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                 >
-                                  <Building2 className="w-4 h-4" />
-                                  <span>Properties</span>
-                                </Link>
+                                  <span className="flex items-center gap-3">
+                                    <Grid className="w-4 h-4" />
+                                    <span>Categories</span>
+                                  </span>
+                                  <ChevronDown className={`w-4 h-4 shrink-0 transition-transform ${isUserDropdownCategoriesOpen ? "rotate-180" : ""}`} />
+                                </button>
+                                {isUserDropdownCategoriesOpen && (
+                                  <div className="pl-6 pr-2 py-1 space-y-0.5">
+                                    <Link
+                                      href="/properties"
+                                      onClick={() => { setIsUserDropdownOpen(false); setIsUserDropdownCategoriesOpen(false); }}
+                                      className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-primary-50 hover:text-primary-700 transition-colors"
+                                    >
+                                      <Building2 className="w-4 h-4" />
+                                      <span>Properties</span>
+                                    </Link>
+                                    <Link
+                                      href="/vehicles"
+                                      onClick={() => { setIsUserDropdownOpen(false); setIsUserDropdownCategoriesOpen(false); }}
+                                      className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-primary-50 hover:text-primary-700 transition-colors"
+                                    >
+                                      <Car className="w-4 h-4" />
+                                      <span>Vehicles</span>
+                                    </Link>
+                                  </div>
+                                )}
                                 <Link
                                   href="/about"
                                   onClick={() => setIsUserDropdownOpen(false)}
-                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                 >
                                   <Users className="w-4 h-4" />
                                   <span>About Us</span>
@@ -415,21 +441,21 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                                 <Link
                                   href="/contact"
                                   onClick={() => setIsUserDropdownOpen(false)}
-                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                 >
                                   <Phone className="w-4 h-4" />
                                   <span>Contact Us</span>
                                 </Link>
                               </div>
 
-                              <div className="border-t border-neutral-100 my-1"></div>
+                              <div className="border-t border-primary-100 my-1"></div>
 
                               {/* Groups & Subscription Section */}
                               <div className="px-2 py-1">
                                 <Link
                                   href="/user/groups"
                                   onClick={() => setIsUserDropdownOpen(false)}
-                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                 >
                                   <Users className="w-4 h-4" />
                                   <span>Your Groups</span>
@@ -437,7 +463,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                                 <Link
                                   href="/user/subscribe"
                                   onClick={() => setIsUserDropdownOpen(false)}
-                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                 >
                                   <Bell className="w-4 h-4" />
                                   <span>Subscribe</span>
@@ -445,21 +471,21 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                                 <Link
                                   href="/compare"
                                   onClick={() => setIsUserDropdownOpen(false)}
-                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                 >
                                   <GitCompare className="w-4 h-4" />
                                   <span>Compare</span>
                                 </Link>
                               </div>
 
-                              <div className="border-t border-neutral-100 my-1"></div>
+                              <div className="border-t border-primary-100 my-1"></div>
 
                               {/* Financial/Tracking Section */}
                               <div className="px-2 py-1">
                                 <Link
                                   href="/user/transactions"
                                   onClick={() => setIsUserDropdownOpen(false)}
-                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                 >
                                   <CreditCard className="w-4 h-4" />
                                   <span>Transactions</span>
@@ -467,7 +493,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                                 <Link
                                   href="/user/coupons"
                                   onClick={() => setIsUserDropdownOpen(false)}
-                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                 >
                                   <Tag className="w-4 h-4" />
                                   <span>Coupons</span>
@@ -475,14 +501,14 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                                 <Link
                                   href="/user/shortlisted"
                                   onClick={() => setIsUserDropdownOpen(false)}
-                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                                 >
                                   <Heart className="w-4 h-4" />
                                   <span>Shortlisted</span>
                                 </Link>
                               </div>
 
-                              <div className="border-t border-neutral-100 my-1"></div>
+                              <div className="border-t border-primary-100 my-1"></div>
 
                               {/* Logout */}
                               <div className="px-2 py-1">
@@ -554,17 +580,17 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-2xl border border-neutral-200 overflow-hidden z-50"
+                          className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl shadow-primary-500/10 border border-primary-200 overflow-hidden z-50 user-dropdown-container"
                         >
                           {/* User Info Header */}
-                          <div className="px-4 py-3 border-b border-neutral-100 bg-neutral-50">
+                          <div className="px-4 py-3 border-b border-primary-100 bg-primary-50/80">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center">
-                                <User className="w-5 h-5 text-neutral-600" />
+                              <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                                <User className="w-5 h-5 text-primary-600" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold text-neutral-900 truncate">{userInfo.name}</p>
-                                <p className="text-xs text-neutral-500 truncate">{formatPhoneNumber(userInfo.phoneNumber)}</p>
+                                <p className="text-xs text-primary-600/80 truncate">{formatPhoneNumber(userInfo.phoneNumber)}</p>
                               </div>
                             </div>
                           </div>
@@ -576,23 +602,46 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                               <Link
                                 href="/"
                                 onClick={() => setIsUserDropdownOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                               >
                                 <Home className="w-4 h-4" />
                                 <span>Home</span>
                               </Link>
-                              <Link
-                                href="/properties"
-                                onClick={() => setIsUserDropdownOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                              <button
+                                type="button"
+                                onClick={() => setIsUserDropdownCategoriesOpen((prev) => !prev)}
+                                className="w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                               >
-                                <Grid className="w-4 h-4" />
-                                <span>Properties</span>
-                              </Link>
+                                <span className="flex items-center gap-3">
+                                  <Grid className="w-4 h-4" />
+                                  <span>Categories</span>
+                                </span>
+                                <ChevronDown className={`w-4 h-4 shrink-0 transition-transform ${isUserDropdownCategoriesOpen ? "rotate-180" : ""}`} />
+                              </button>
+                              {isUserDropdownCategoriesOpen && (
+                                <div className="pl-6 pr-2 py-1 space-y-0.5">
+                                  <Link
+                                    href="/properties"
+                                    onClick={() => { setIsUserDropdownOpen(false); setIsUserDropdownCategoriesOpen(false); }}
+                                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-primary-50 hover:text-primary-700 transition-colors"
+                                  >
+                                    <Building2 className="w-4 h-4" />
+                                    <span>Properties</span>
+                                  </Link>
+                                  <Link
+                                    href="/vehicles"
+                                    onClick={() => { setIsUserDropdownOpen(false); setIsUserDropdownCategoriesOpen(false); }}
+                                    className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-600 hover:bg-primary-50 hover:text-primary-700 transition-colors"
+                                  >
+                                    <Car className="w-4 h-4" />
+                                    <span>Vehicles</span>
+                                  </Link>
+                                </div>
+                              )}
                               <Link
                                 href="/about"
                                 onClick={() => setIsUserDropdownOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                               >
                                 <Users className="w-4 h-4" />
                                 <span>About Us</span>
@@ -600,21 +649,21 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                               <Link
                                 href="/contact"
                                 onClick={() => setIsUserDropdownOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                               >
                                 <Phone className="w-4 h-4" />
                                 <span>Contact Us</span>
                               </Link>
                             </div>
 
-                            <div className="border-t border-neutral-100 my-1"></div>
+                            <div className="border-t border-primary-100 my-1"></div>
 
                             {/* Groups & Subscription Section */}
                             <div className="px-2 py-1">
                               <Link
                                 href="/user/groups"
                                 onClick={() => setIsUserDropdownOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                               >
                                 <Users className="w-4 h-4" />
                                 <span>Your Groups</span>
@@ -622,7 +671,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                               <Link
                                 href="/user/subscribe"
                                 onClick={() => setIsUserDropdownOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                               >
                                 <Bell className="w-4 h-4" />
                                 <span>Subscribe</span>
@@ -630,21 +679,21 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                               <Link
                                 href="/compare"
                                 onClick={() => setIsUserDropdownOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                               >
                                 <GitCompare className="w-4 h-4" />
                                 <span>Compare</span>
                               </Link>
                             </div>
 
-                            <div className="border-t border-neutral-100 my-1"></div>
+                            <div className="border-t border-primary-100 my-1"></div>
 
                             {/* Financial/Tracking Section */}
                             <div className="px-2 py-1">
                               <Link
                                 href="/user/transactions"
                                 onClick={() => setIsUserDropdownOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                               >
                                 <CreditCard className="w-4 h-4" />
                                 <span>Transactions</span>
@@ -652,7 +701,7 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                               <Link
                                 href="/user/coupons"
                                 onClick={() => setIsUserDropdownOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                               >
                                 <Tag className="w-4 h-4" />
                                 <span>Coupons</span>
@@ -660,14 +709,14 @@ export default function Header({ onLoginClick, hideNavigation = false, searchPro
                               <Link
                                 href="/user/shortlisted"
                                 onClick={() => setIsUserDropdownOpen(false)}
-                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-neutral-100 transition-colors"
+                                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-neutral-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
                               >
                                 <Heart className="w-4 h-4" />
                                 <span>Shortlisted</span>
                               </Link>
                             </div>
 
-                            <div className="border-t border-neutral-100 my-1"></div>
+                            <div className="border-t border-primary-100 my-1"></div>
 
                             {/* Logout */}
                             <div className="px-2 py-1">

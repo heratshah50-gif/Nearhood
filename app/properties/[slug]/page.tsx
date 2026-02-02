@@ -298,11 +298,11 @@ export default function PropertyDetailPage({ params }: PropertyDetailPageProps) 
                       <div className="flex flex-col sm:flex-row gap-2 mt-3">
                         <button 
                           onClick={handleJoinGroup}
-                          className="flex-1 inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-red-500 text-white text-sm font-semibold shadow hover:bg-red-600 transition-colors"
+                          className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-red-500 text-white text-sm font-semibold shadow hover:bg-red-600 transition-colors"
                         >
                           Join this group deal
                         </button>
-                        <button className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-sm font-medium text-neutral-800 hover:bg-neutral-50">
+                        <button className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-lg border border-neutral-300 bg-white text-sm font-medium text-neutral-800 hover:bg-neutral-50">
                           Talk to Nearhood expert
                         </button>
                       </div>

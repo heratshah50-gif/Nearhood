@@ -25,7 +25,7 @@ export const ALL_PROPERTIES: Property[] = [
     name: "Adani Shantigram",
     location: "Bopal",
     city: "Ahmedabad",
-    image: getPropertyImage(0),
+    image: "/images/adani-shantigram.png",
     bhkOptions: ["2 BHK", "3 BHK", "4 BHK"],
     superArea: "1,245 - 2,890 sq.ft.",
     groupSize: 5,
